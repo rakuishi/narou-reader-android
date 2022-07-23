@@ -6,12 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.rememberNavController
 import com.rakuishi.narou.App
-import com.rakuishi.narou.ui.home.HomeScreen
-import com.rakuishi.narou.ui.home.HomeViewModel
 import com.rakuishi.narou.ui.theme.NarouReaderTheme
 
 class MainActivity : ComponentActivity() {
@@ -26,18 +23,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
+                    val navController = rememberNavController()
+                    AppNavHost(app = application as App, navController = navController)
                 }
             }
         }
-    }
-
-    @Composable
-    private fun HomeScreen() {
-        HomeScreen(
-            viewModel = viewModel(
-                factory = HomeViewModel.provideFactory((applicationContext as App).novelRepository)
-            )
-        )
     }
 }
