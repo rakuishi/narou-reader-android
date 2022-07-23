@@ -17,6 +17,9 @@ data class Novel(
     @ColumnInfo(name = "has_new_episode") var hasNewEpisode: Boolean,
 ) {
 
+    val url: String
+        get() = "https://ncode.syosetu.com/${nid}/"
+
     val currentEpisodeUrl: String
         get() = "https://ncode.syosetu.com/${nid}/${currentEpisodeNumber}/"
 }

@@ -22,7 +22,7 @@ class HomeViewModel(
 
     fun fetchNovelList() {
         viewModelScope.launch {
-            novelList.value = repository.getList()
+            novelList.value = repository.fetchList()
         }
     }
 
