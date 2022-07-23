@@ -29,6 +29,12 @@ class NovelViewModel(
         }
     }
 
+    fun updateCurrentEpisodeNumberIfMatched(url: String) {
+        viewModelScope.launch {
+            repository.updateCurrentEpisodeNumberIfMatched(url)
+        }
+    }
+
     companion object {
 
         fun provideFactory(
