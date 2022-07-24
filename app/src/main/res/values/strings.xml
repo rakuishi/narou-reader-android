@@ -4,4 +4,5 @@
     <string name="novel_latest_episode_meta">%d/%d Episodes・Updated on %s</string>
     <string name="has_new_episode">New episode!</string>
     <string name="add_novel">Add novel</string>
+    <string name="move_to_latest_episode">Move to latest episode</string>
 </resources>

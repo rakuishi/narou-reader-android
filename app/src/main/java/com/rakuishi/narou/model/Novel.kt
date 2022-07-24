@@ -22,4 +22,7 @@ data class Novel(
 
     val currentEpisodeUrl: String
         get() = "https://ncode.syosetu.com/${nid}/${currentEpisodeNumber}/"
+
+    val latestEpisodeUrl: String
+        get() = "https://ncode.syosetu.com/${nid}/${latestEpisodeNumber}/"
 }
