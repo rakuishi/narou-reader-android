@@ -41,6 +41,7 @@ fun NovelListItem(novel: Novel, onNovelClicked: (novel: Novel) -> Unit) {
             Text(
                 text = stringResource(
                     R.string.novel_latest_episode_meta,
+                    novel.currentEpisodeNumber,
                     novel.latestEpisodeNumber,
                     sdf.format(novel.latestEpisodeUpdatedAt)
                 ),
