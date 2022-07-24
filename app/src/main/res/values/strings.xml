@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">Narou Reader</string>
     <string name="back">Back</string>
+    <string name="novel_latest_episode_meta">%d Episodes・Updated on %s</string>
+    <string name="has_new_episode">New episode!</string>
 </resources>
