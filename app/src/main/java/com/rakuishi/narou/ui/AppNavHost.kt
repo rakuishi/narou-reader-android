@@ -1,12 +1,16 @@
 package com.rakuishi.narou.ui
 
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.slideIn
+import androidx.compose.animation.slideOut
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.composable
 import com.rakuishi.narou.App
 import com.rakuishi.narou.ui.home.HomeScreen
 import com.rakuishi.narou.ui.home.HomeViewModel
@@ -21,14 +25,27 @@ object Destination {
     fun createNovelRoute(novelId: Int): String = "novel/$novelId"
 }
 
+@ExperimentalAnimationApi
 @Composable
 fun AppNavHost(
     app: App,
     navController: NavHostController,
 ) {
-    NavHost(
+    AnimatedNavHost(
         navController = navController,
-        startDestination = Destination.HOME_ROUTE
+        startDestination = Destination.HOME_ROUTE,
+        enterTransition = {
+            slideIn { fullSize -> IntOffset(fullSize.width, 0) }
+        },
+        popEnterTransition = {
+            slideIn { fullSize -> IntOffset(-fullSize.width, 0) }
+        },
+        exitTransition = {
+            slideOut { fullSize -> IntOffset(-fullSize.width, 0) }
+        },
+        popExitTransition = {
+            slideOut { fullSize -> IntOffset(fullSize.width, 0) }
+        },
     ) {
         composable(Destination.HOME_ROUTE) {
             HomeScreen(

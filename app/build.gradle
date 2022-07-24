@@ -79,6 +79,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.10.0'
 
     implementation "com.google.accompanist:accompanist-swiperefresh:0.23.1"
+    implementation "com.google.accompanist:accompanist-navigation-animation:0.23.1"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
