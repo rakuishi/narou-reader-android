@@ -4,8 +4,6 @@ import android.annotation.SuppressLint
 import android.net.http.SslError
 import android.webkit.*
 import androidx.activity.compose.BackHandler
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -67,15 +65,18 @@ fun NovelScreen(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false }
                     ) {
-                        DropdownMenuItem(onClick = {
-                            viewModel.result.value.novel?.latestEpisodeUrl?.let {
-                                updateCurrentUrl(it)
-                                webView?.loadUrl(it)
+                        DropdownMenuItem(
+                            text = {
+                                Text(text = stringResource(R.string.move_to_latest_episode))
+                            },
+                            onClick = {
+                                viewModel.result.value.novel?.latestEpisodeUrl?.let {
+                                    updateCurrentUrl(it)
+                                    webView?.loadUrl(it)
+                                }
+                                showMenu = false
                             }
-                            showMenu = false
-                        }) {
-                            Text(text = stringResource(R.string.move_to_latest_episode))
-                        }
+                        )
                     }
                 }
             )
