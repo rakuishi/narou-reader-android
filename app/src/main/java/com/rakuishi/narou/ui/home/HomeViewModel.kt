@@ -13,6 +13,8 @@ class HomeViewModel(
     private val repository: NovelRepository,
 ) : ViewModel() {
 
+    var isRefreshing: MutableState<Boolean> = mutableStateOf(false)
+        private set
     var novelList: MutableState<List<Novel>> = mutableStateOf(arrayListOf())
         private set
 
@@ -22,7 +24,9 @@ class HomeViewModel(
 
     fun fetchNovelList() {
         viewModelScope.launch {
+            isRefreshing.value = true
             novelList.value = repository.fetchList()
+            isRefreshing.value = false
         }
     }
 

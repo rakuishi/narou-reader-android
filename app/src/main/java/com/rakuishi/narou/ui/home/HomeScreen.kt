@@ -3,14 +3,15 @@ package com.rakuishi.narou.ui.home
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.Destination
@@ -27,10 +28,25 @@ fun HomeScreen(
             SmallTopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                // TODO: Show AlertDialog with TextField
+            }) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(id = R.string.add_novel)
+                )
+            }
         }
     ) {
-        NovelList(items = viewModel.novelList.value) { novel ->
-            navController.navigate(Destination.createNovelRoute(novel.id))
+        SwipeRefresh(
+            state = rememberSwipeRefreshState(viewModel.isRefreshing.value),
+            onRefresh = { viewModel.fetchNovelList() },
+        ) {
+            NovelList(items = viewModel.novelList.value) { novel ->
+                navController.navigate(Destination.createNovelRoute(novel.id))
+            }
         }
     }
 }
