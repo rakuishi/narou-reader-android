@@ -53,6 +53,7 @@ fun HomeScreen(
             }
         ) {
             NovelList(items = viewModel.novelList.value) { novel ->
+                viewModel.consumeHasNewEpisodeIfNeeded(novel)
                 navController.navigate(Destination.createNovelRoute(novel.id))
             }
         }

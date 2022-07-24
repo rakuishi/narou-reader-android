@@ -72,4 +72,11 @@ class NovelRepository(private val dao: NovelDao) {
         novel.currentEpisodeNumber = episodeNumber
         dao.update(novel)
     }
+
+    suspend fun consumeHasNewEpisodeIfNeeded(novel: Novel) {
+        if (novel.hasNewEpisode) {
+            novel.hasNewEpisode = false
+            dao.update(novel)
+        }
+    }
 }

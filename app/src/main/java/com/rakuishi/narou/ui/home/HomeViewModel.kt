@@ -30,6 +30,12 @@ class HomeViewModel(
         }
     }
 
+    fun consumeHasNewEpisodeIfNeeded(novel: Novel) {
+        viewModelScope.launch {
+            repository.consumeHasNewEpisodeIfNeeded(novel)
+        }
+    }
+
     companion object {
 
         fun provideFactory(
