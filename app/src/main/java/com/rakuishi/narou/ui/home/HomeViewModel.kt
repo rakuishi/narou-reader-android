@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.model.Novel
 import kotlinx.coroutines.launch
+import java.util.*
 
 class HomeViewModel(
     private val repository: NovelRepository,
@@ -16,6 +17,8 @@ class HomeViewModel(
     var isRefreshing: MutableState<Boolean> = mutableStateOf(false)
         private set
     var novelList: MutableState<List<Novel>> = mutableStateOf(arrayListOf())
+        private set
+    var fetchedAt: MutableState<Date?> = mutableStateOf(null)
         private set
 
     init {
@@ -26,6 +29,7 @@ class HomeViewModel(
         viewModelScope.launch {
             isRefreshing.value = true
             novelList.value = repository.fetchList()
+            fetchedAt.value = Date()
             isRefreshing.value = false
         }
     }

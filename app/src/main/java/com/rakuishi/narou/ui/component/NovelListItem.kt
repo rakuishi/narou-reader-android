@@ -19,8 +19,6 @@ import com.rakuishi.narou.util.SampleDataProvider
 import java.text.SimpleDateFormat
 import java.util.*
 
-private val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)
-
 @Composable
 fun NovelListItem(novel: Novel, onNovelClicked: (novel: Novel) -> Unit) {
     Row(
@@ -43,7 +41,10 @@ fun NovelListItem(novel: Novel, onNovelClicked: (novel: Novel) -> Unit) {
                     R.string.novel_latest_episode_meta,
                     novel.currentEpisodeNumber,
                     novel.latestEpisodeNumber,
-                    sdf.format(novel.latestEpisodeUpdatedAt)
+                    SimpleDateFormat(
+                        "MM/dd HH:mm",
+                        Locale.JAPAN
+                    ).format(novel.latestEpisodeUpdatedAt)
                 ),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(top = 4.dp),
