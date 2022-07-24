@@ -21,6 +21,6 @@ interface NovelDao {
     @Query("SELECT * FROM novels WHERE nid = :nid LIMIT 1")
     suspend fun getItemByNid(nid: String): Novel?
 
-    @Query("SELECT * FROM novels")
+    @Query("SELECT * FROM novels ORDER BY latest_episode_updated_at DESC")
     suspend fun getList(): List<Novel>
 }
