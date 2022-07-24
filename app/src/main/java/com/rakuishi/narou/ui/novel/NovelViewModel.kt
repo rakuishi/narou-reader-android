@@ -5,45 +5,57 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.rakuishi.narou.data.DataStoreRepository
 import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.model.Novel
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NovelViewModel(
-    private val repository: NovelRepository,
+    private val novelRepository: NovelRepository,
+    private val dataStoreRepository: DataStoreRepository,
     novelId: Int,
 ) : ViewModel() {
 
-    var novel: MutableState<Novel?> = mutableStateOf(null)
+    class Result(
+        var isSuccess: Boolean = true,
+        val novel: Novel? = null,
+        val cookies: Map<String, String>? = null
+    )
+
+    var result: MutableState<Result> = mutableStateOf(Result(isSuccess = false))
         private set
 
     init {
-        fetchNovel(novelId)
-    }
-
-    private fun fetchNovel(id: Int) {
         viewModelScope.launch {
-            repository.getItemById(id)?.let {
-                novel.value = it
-            }
+            val novel = novelRepository.getItemById(novelId) ?: return@launch
+            val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
+            result.value = Result(isSuccess = true, novel, cookies)
         }
     }
 
     fun updateCurrentEpisodeNumberIfMatched(url: String) {
         viewModelScope.launch {
-            repository.updateCurrentEpisodeNumberIfMatched(url)
+            novelRepository.updateCurrentEpisodeNumberIfMatched(url)
+        }
+    }
+
+    fun saveCookies(url: String, cookiesString: String) {
+        viewModelScope.launch {
+            dataStoreRepository.saveCookies(url, cookiesString)
         }
     }
 
     companion object {
 
         fun provideFactory(
-            repository: NovelRepository,
+            novelRepository: NovelRepository,
+            dataStoreRepository: DataStoreRepository,
             novelId: Int,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return NovelViewModel(repository, novelId) as T
+                return NovelViewModel(novelRepository, dataStoreRepository, novelId) as T
             }
         }
     }

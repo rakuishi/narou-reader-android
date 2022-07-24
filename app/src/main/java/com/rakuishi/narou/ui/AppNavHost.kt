@@ -46,7 +46,11 @@ fun AppNavHost(
             NovelScreen(
                 navController,
                 viewModel(
-                    factory = NovelViewModel.provideFactory(app.novelRepository, novelId)
+                    factory = NovelViewModel.provideFactory(
+                        app.novelRepository,
+                        app.dataStoreRepository,
+                        novelId
+                    )
                 )
             )
         }

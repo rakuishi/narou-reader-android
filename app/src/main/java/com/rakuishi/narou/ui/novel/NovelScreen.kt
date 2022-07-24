@@ -2,10 +2,8 @@ package com.rakuishi.narou.ui.novel
 
 import android.annotation.SuppressLint
 import android.net.http.SslError
-import android.webkit.SslErrorHandler
-import android.webkit.WebResourceRequest
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
+import androidx.activity.compose.BackHandler
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -22,18 +20,26 @@ fun NovelScreen(
     navController: NavController,
     viewModel: NovelViewModel,
 ) {
+    var currentUrl: String? = null
+    val popBackStackAndSaveCookieSettings = {
+        currentUrl?.let {
+            viewModel.saveCookies(it, CookieManager.getInstance().getCookie(it))
+        }
+        navController.popBackStack()
+    }
+
     Scaffold(
         topBar = {
             SmallTopAppBar(
                 title = {
                     Text(
-                        text = viewModel.novel.value?.title ?: "",
+                        text = viewModel.result.value.novel?.title ?: "",
                         maxLines = 1,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        navController.popBackStack()
+                        popBackStackAndSaveCookieSettings.invoke()
                     }) {
                         Icon(
                             Icons.Default.ArrowBack,
@@ -44,17 +50,30 @@ fun NovelScreen(
             )
         }
     ) {
-        viewModel.novel.value?.let { novel ->
-            WebViewCompose(url = novel.currentEpisodeUrl) { url ->
+        if (viewModel.result.value.isSuccess) {
+            val result = viewModel.result.value
+            val novel = result.novel ?: throw NullPointerException()
+            val cookies = result.cookies ?: throw NullPointerException()
+
+            currentUrl = novel.currentEpisodeUrl
+
+            WebViewCompose(novel.currentEpisodeUrl, cookies) { url ->
+                currentUrl = url
                 viewModel.updateCurrentEpisodeNumberIfMatched(url)
             }
         }
     }
+
+    BackHandler {
+        popBackStackAndSaveCookieSettings.invoke()
+    }
 }
 
+@SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewCompose(
     url: String,
+    cookies: Map<String, String>,
     onUrlChanged: (String) -> Unit,
 ) {
     AndroidView(
@@ -83,6 +102,13 @@ fun WebViewCompose(
                     }
                 }
             }
+            webView.settings.javaScriptEnabled = true
+            webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+
+            val cookieManager = CookieManager.getInstance()
+            cookies.forEach { (key, value) -> cookieManager.setCookie(key, value) }
+            if (cookieManager.hasCookies()) cookieManager.flush()
+
             webView.loadUrl(url)
         }
     )
