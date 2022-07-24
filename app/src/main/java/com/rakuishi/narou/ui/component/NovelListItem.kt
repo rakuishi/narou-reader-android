@@ -23,44 +23,41 @@ private val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)
 
 @Composable
 fun NovelListItem(novel: Novel, onNovelClicked: (novel: Novel) -> Unit) {
-    Column(
+    Row(
         modifier = Modifier
-            .clickable { onNovelClicked.invoke(novel) }
             .fillMaxWidth()
-            .padding(16.dp)
+            .clickable { onNovelClicked.invoke(novel) },
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (novel.hasNewEpisode) {
-            Row(
-                modifier = Modifier.padding(bottom = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_new_episode_24),
-                    modifier = Modifier.size(18.dp),
-                    contentDescription = stringResource(R.string.has_new_episode),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-                Text(
-                    text = stringResource(R.string.has_new_episode),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = novel.title,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+            Text(
+                text = stringResource(
+                    R.string.novel_latest_episode_meta,
+                    novel.latestEpisodeNumber,
+                    sdf.format(novel.latestEpisodeUpdatedAt)
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(top = 4.dp),
+                color = MaterialTheme.colorScheme.secondary,
+            )
         }
-        Text(
-            text = novel.title,
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Text(
-            text = stringResource(
-                R.string.novel_latest_episode_meta,
-                novel.latestEpisodeNumber,
-                sdf.format(novel.latestEpisodeUpdatedAt)
-            ),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(top = 8.dp),
-            color = MaterialTheme.colorScheme.secondary,
-        )
+        if (novel.hasNewEpisode) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_new_episode_24),
+                modifier = Modifier.size(18.dp),
+                contentDescription = stringResource(R.string.has_new_episode),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.size(16.dp))
+        }
     }
 }
 

@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
@@ -43,6 +44,13 @@ fun HomeScreen(
         SwipeRefresh(
             state = rememberSwipeRefreshState(viewModel.isRefreshing.value),
             onRefresh = { viewModel.fetchNovelList() },
+            indicator = { state, trigger ->
+                SwipeRefreshIndicator(
+                    state = state,
+                    refreshTriggerDistance = trigger,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
+            }
         ) {
             NovelList(items = viewModel.novelList.value) { novel ->
                 navController.navigate(Destination.createNovelRoute(novel.id))
