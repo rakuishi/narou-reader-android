@@ -4,12 +4,17 @@ import android.annotation.SuppressLint
 import android.net.http.SslError
 import android.webkit.*
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.rakuishi.narou.BuildConfig
@@ -63,11 +68,27 @@ fun NovelScreen(
 
                     DropdownMenu(
                         expanded = showMenu,
-                        onDismissRequest = { showMenu = false }
+                        onDismissRequest = { showMenu = false },
+                        modifier = Modifier.width(200.dp),
                     ) {
                         DropdownMenuItem(
                             text = {
-                                Text(text = stringResource(R.string.move_to_latest_episode))
+                                Row(
+                                    modifier = Modifier.wrapContentWidth()
+                                )
+                                {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_new_episode_24),
+                                        contentDescription = stringResource(R.string.move_to_latest_episode)
+                                    )
+                                    Text(
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        text = stringResource(R.string.move_to_latest_episode),
+                                        modifier = Modifier.padding(start = 16.dp),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
                             },
                             onClick = {
                                 viewModel.result.value.novel?.latestEpisodeUrl?.let {

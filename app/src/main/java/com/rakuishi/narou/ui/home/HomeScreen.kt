@@ -30,7 +30,7 @@ fun HomeScreen(
 ) {
     Scaffold(
         topBar = {
-            LargeTopAppBar(
+            SmallTopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
             )
         },

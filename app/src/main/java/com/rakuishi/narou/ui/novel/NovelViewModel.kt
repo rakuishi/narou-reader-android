@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.rakuishi.narou.data.DataStoreRepository
 import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.model.Novel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -30,6 +31,7 @@ class NovelViewModel(
         viewModelScope.launch {
             val novel = novelRepository.getItemById(novelId) ?: return@launch
             val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
+            delay(400L) // for smooth transition
             result.value = Result(isSuccess = true, novel, cookies)
         }
     }

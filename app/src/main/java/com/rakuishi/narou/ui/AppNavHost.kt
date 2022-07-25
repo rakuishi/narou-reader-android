@@ -1,10 +1,7 @@
 package com.rakuishi.narou.ui
 
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.slideIn
-import androidx.compose.animation.slideOut
+import androidx.compose.animation.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -35,16 +32,16 @@ fun AppNavHost(
         navController = navController,
         startDestination = Destination.HOME_ROUTE,
         enterTransition = {
-            slideIn { fullSize -> IntOffset(fullSize.width, 0) }
+            fadeIn()
         },
         popEnterTransition = {
-            slideIn { fullSize -> IntOffset(-fullSize.width, 0) }
+            fadeIn()
         },
         exitTransition = {
-            slideOut { fullSize -> IntOffset(-fullSize.width, 0) }
+            fadeOut()
         },
         popExitTransition = {
-            slideOut { fullSize -> IntOffset(fullSize.width, 0) }
+            fadeOut()
         },
     ) {
         composable(Destination.HOME_ROUTE) {
