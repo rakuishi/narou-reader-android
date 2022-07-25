@@ -13,9 +13,71 @@ import java.util.*
 
 class NovelRepository(private val dao: NovelDao) {
 
+    private val titleRegex =
+        Regex("""<meta property="og:title" content="(.+?)" />""")
+    private val authorNameRegex =
+        Regex("""<meta name="twitter:creator" content="(.+?)">""")
+
+    private fun latestEpisodeRegex(nid: String): Regex =
+        Regex("""<dd class="subtitle">\s+<a href="/${nid}/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})<""")
+
     suspend fun insert(novel: Novel) = dao.insert(novel)
 
     suspend fun getItemById(id: Int): Novel? = dao.getItemById(id)
+
+    suspend fun fetchNewNovel(url: String): Novel? {
+        val regex = Regex("""^https://ncode.syosetu.com/([a-z0-9]+)/$""")
+        val match = regex.find(url) ?: return null
+        val nid = match.groups[1]?.value ?: return null
+        return fetchNewNovelFromNarouServer(nid)
+    }
+
+    @Suppress("BlockingMethodInNonBlockingContext")
+    suspend fun fetchNewNovelFromNarouServer(nid: String) =
+        withContext(Dispatchers.IO) {
+            val client = OkHttpClient()
+            val url = "https://ncode.syosetu.com/${nid}/"
+            val request = Request.Builder().url(url).get().build()
+            val response = client.newCall(request).await()
+            val body = response.body?.string() ?: ""
+            val novel = Novel(
+                id = 0,
+                nid = nid,
+                title = "",
+                authorName = "",
+                latestEpisodeNumber = 0,
+                latestEpisodeUpdatedAt = Date(),
+                currentEpisodeNumber = 1,
+                hasNewEpisode = false,
+            )
+
+            titleRegex.find(body)?.let {
+                novel.title = it.groups[1]?.value ?: ""
+            }
+
+            authorNameRegex.find(body)?.let {
+                novel.authorName = it.groups[1]?.value ?: ""
+            }
+
+            latestEpisodeRegex(novel.nid).findAll(body).lastOrNull()?.let { it ->
+                novel.latestEpisodeNumber = it.groups[1]?.value?.toInt() ?: 0
+
+                val updatedAtString = it.groups[2]?.value ?: ""
+                getDateByUpdatedAtString(updatedAtString)?.let { updatedAt ->
+                    novel.latestEpisodeUpdatedAt = updatedAt
+                }
+            }
+
+            return@withContext if (novel.title.isNotEmpty()
+                && novel.authorName.isNotEmpty()
+                && novel.latestEpisodeNumber > 0
+            ) {
+                dao.insert(novel)
+                novel
+            } else {
+                null
+            }
+        }
 
     suspend fun fetchList(): List<Novel> {
         val client = OkHttpClient()
@@ -34,11 +96,8 @@ class NovelRepository(private val dao: NovelDao) {
             val request = Request.Builder().url(novel.url).get().build()
             val response = client.newCall(request).await()
             val body = response.body?.string() ?: ""
-            val regex =
-                Regex("""<dd class="subtitle">\s+<a href="/${novel.nid}/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})<""")
-            val match = regex.findAll(body)
 
-            match.lastOrNull()?.let {
+            latestEpisodeRegex(novel.nid).findAll(body).lastOrNull()?.let {
                 val episodeNumber = it.groups[1]?.value?.toInt() ?: 0
                 val updatedAtString = it.groups[2]?.value ?: ""
                 updateByLatestEpisodeNumberIfNeeded(novel, episodeNumber, updatedAtString)
@@ -50,12 +109,7 @@ class NovelRepository(private val dao: NovelDao) {
         episodeNumber: Int,
         updatedAtString: String
     ) {
-        val updatedAt: Date = try {
-            val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)
-            sdf.parse(updatedAtString)
-        } catch (e: ParseException) {
-            null
-        } ?: return
+        val updatedAt: Date = getDateByUpdatedAtString(updatedAtString) ?: return
 
         if (episodeNumber > novel.latestEpisodeNumber || updatedAt.after(novel.latestEpisodeUpdatedAt)) {
             novel.latestEpisodeNumber = episodeNumber
@@ -79,6 +133,15 @@ class NovelRepository(private val dao: NovelDao) {
         if (novel.hasNewEpisode) {
             novel.hasNewEpisode = false
             dao.update(novel)
+        }
+    }
+
+    private fun getDateByUpdatedAtString(updatedAtString: String): Date? {
+        return try {
+            val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)
+            sdf.parse(updatedAtString)
+        } catch (e: ParseException) {
+            null
         }
     }
 }

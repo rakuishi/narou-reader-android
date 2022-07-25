@@ -31,6 +31,13 @@ class NovelRepositoryTest {
     }
 
     @Test
+    fun fetchNewNovel() = runBlocking {
+        val novel = novelRepository.fetchNewNovel("https://ncode.syosetu.com/n9669bk/")
+        assertEquals(novel?.title, "無職転生　- 異世界行ったら本気だす -")
+        assertEquals(novel?.authorName, "理不尽な孫の手")
+    }
+
+    @Test
     fun fetchNewEpisodeFromNarouServer() = runBlocking {
         // 完結済
         val novel = Novel(
