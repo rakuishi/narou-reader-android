@@ -13,6 +13,8 @@ import java.util.*
 
 class NovelRepository(private val dao: NovelDao) {
 
+    suspend fun insert(novel: Novel) = dao.insert(novel)
+
     suspend fun getItemById(id: Int): Novel? = dao.getItemById(id)
 
     suspend fun fetchList(): List<Novel> {
@@ -27,13 +29,13 @@ class NovelRepository(private val dao: NovelDao) {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    private suspend fun fetchNewEpisodeFromNarouServer(novel: Novel, client: OkHttpClient) =
+    suspend fun fetchNewEpisodeFromNarouServer(novel: Novel, client: OkHttpClient) =
         withContext(Dispatchers.IO) {
             val request = Request.Builder().url(novel.url).get().build()
             val response = client.newCall(request).await()
             val body = response.body?.string() ?: ""
             val regex =
-                Regex("""<dd class="subtitle">\s+<a href="/${novel.nid}/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})</dt>""")
+                Regex("""<dd class="subtitle">\s+<a href="/${novel.nid}/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})<""")
             val match = regex.findAll(body)
 
             match.lastOrNull()?.let {
