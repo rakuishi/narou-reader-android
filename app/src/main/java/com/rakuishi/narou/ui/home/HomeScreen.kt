@@ -91,13 +91,11 @@ fun HomeScreen(
     }
 
     if (openDialog.value) {
-        val error = stringResource(R.string.enter_url_error)
-
         TextFieldDialog(
             title = stringResource(R.string.enter_url_title),
             placeholder = stringResource(R.string.enter_url_placeholder),
             openDialog = openDialog,
-            onPositiveClick = { viewModel.insertNewNovel(it, error) }
+            onPositiveClick = { viewModel.insertNewNovel(it) }
         )
     }
 }

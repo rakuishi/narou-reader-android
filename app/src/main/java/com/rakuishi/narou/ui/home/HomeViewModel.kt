@@ -37,13 +37,13 @@ class HomeViewModel(
         }
     }
 
-    fun insertNewNovel(url: String, error: String) {
+    fun insertNewNovel(url: String) {
         viewModelScope.launch {
             val novel: Novel? = novelRepository.insertNewNovel(url)
             if (novel != null) {
                 fetchNovelList()
             } else {
-                snackbarHostState.value.showSnackbar(message = error)
+                snackbarHostState.value.showSnackbar(message = "The URL doesn\\'t match https://ncode.syosetu.com/***/")
             }
         }
     }
