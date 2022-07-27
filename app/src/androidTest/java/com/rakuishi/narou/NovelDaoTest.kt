@@ -6,10 +6,12 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rakuishi.narou.database.AppDatabase
 import com.rakuishi.narou.database.NovelDao
+import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.util.SampleDataProvider
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,8 +36,20 @@ class NovelDaoTest {
 
     @Test
     fun insertNovel() = runBlocking {
-        val novel = SampleDataProvider.novel()
-        dao.insert(novel)
-        assertEquals(dao.getItemById(1)?.nid, novel.nid)
+        dao.insert(SampleDataProvider.novel())
+        val novel1 = dao.getItemById(1) as Novel
+        assertEquals(1, novel1.id)
+
+        dao.insert(SampleDataProvider.novel())
+        val novel2 = dao.getItemById(2) as Novel
+        assertEquals(2, novel2.id)
+    }
+
+    @Test
+    fun deleteNovel() = runBlocking {
+        dao.insert(SampleDataProvider.novel())
+        assertTrue(dao.getItemById(1) != null)
+        dao.delete(1)
+        assertTrue(dao.getItemById(1) == null)
     }
 }

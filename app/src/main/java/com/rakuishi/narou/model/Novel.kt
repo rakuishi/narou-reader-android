@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity(tableName = "novels")
 data class Novel(
-    @PrimaryKey(autoGenerate = true) var id: Int,
+    @PrimaryKey(autoGenerate = true) var id: Long,
     @ColumnInfo(name = "nid") var nid: String,
     @ColumnInfo(name = "title") var title: String,
     @ColumnInfo(name = "author_name") var authorName: String,

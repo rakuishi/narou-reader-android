@@ -1,6 +1,8 @@
 package com.rakuishi.narou.ui
 
-import androidx.compose.animation.*
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -19,7 +21,7 @@ object Destination {
     const val NOVEL_ID = "novel_id"
     const val NOVEL_ROUTE = "novel/{${NOVEL_ID}}"
 
-    fun createNovelRoute(novelId: Int): String = "novel/$novelId"
+    fun createNovelRoute(novelId: Long): String = "novel/$novelId"
 }
 
 @ExperimentalAnimationApi
@@ -54,9 +56,9 @@ fun AppNavHost(
         }
         composable(
             Destination.NOVEL_ROUTE,
-            arguments = listOf(navArgument(Destination.NOVEL_ID) { type = NavType.IntType })
+            arguments = listOf(navArgument(Destination.NOVEL_ID) { type = NavType.LongType })
         ) { backStackEntry ->
-            val novelId = backStackEntry.arguments?.getInt(Destination.NOVEL_ID) ?: 0
+            val novelId = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0
             NovelScreen(
                 navController,
                 viewModel(

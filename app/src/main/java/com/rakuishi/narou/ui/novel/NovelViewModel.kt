@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class NovelViewModel(
     private val novelRepository: NovelRepository,
     private val dataStoreRepository: DataStoreRepository,
-    novelId: Int,
+    novelId: Long,
 ) : ViewModel() {
 
     class Result(
@@ -53,7 +53,7 @@ class NovelViewModel(
         fun provideFactory(
             novelRepository: NovelRepository,
             dataStoreRepository: DataStoreRepository,
-            novelId: Int,
+            novelId: Long,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {

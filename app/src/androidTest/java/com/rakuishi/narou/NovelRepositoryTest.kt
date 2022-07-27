@@ -7,7 +7,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.database.AppDatabase
 import com.rakuishi.narou.model.Novel
-import com.rakuishi.narou.util.SampleDataProvider
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.junit.Assert.assertEquals
@@ -33,8 +32,8 @@ class NovelRepositoryTest {
     @Test
     fun fetchNewNovel() = runBlocking {
         val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n9669bk/")
-        assertEquals(novel?.title, "無職転生　- 異世界行ったら本気だす -")
-        assertEquals(novel?.authorName, "理不尽な孫の手")
+        assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
+        assertEquals("理不尽な孫の手", novel?.authorName)
     }
 
     @Test
@@ -56,14 +55,15 @@ class NovelRepositoryTest {
 
     @Test
     fun updateCurrentEpisodeNumberIfMatched() = runBlocking {
-        val novel1 = SampleDataProvider.novel()
-        novelRepository.insert(novel1)
-        assertEquals(novel1.currentEpisodeNumber, 1)
+        val novel1 = novelRepository.insertNewNovel("https://ncode.syosetu.com/n4811fg/") as Novel
+        assertEquals(1, novel1.id)
+        assertEquals("n4811fg", novel1.nid)
+        assertEquals(1, novel1.currentEpisodeNumber)
 
         val url = "https://ncode.syosetu.com/${novel1.nid}/2/"
         novelRepository.updateCurrentEpisodeNumberIfMatched(url)
 
         val novel2 = novelRepository.getItemById(novel1.id) as Novel
-        assertEquals(novel2.currentEpisodeNumber, 2)
+        assertEquals(2, novel2.currentEpisodeNumber)
     }
 }

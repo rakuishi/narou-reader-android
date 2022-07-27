@@ -11,7 +11,7 @@ object SampleDataProvider {
             "(NULL, 'n5881cl', '賢者の孫', '吉岡剛', 299, 1656987360000, 1, 0)"
 
     fun novel(): Novel = Novel(
-        id = 1,
+        id = 0,
         nid = "n4811fg",
         title = "TRPGプレイヤーが異世界で最強ビルドを目指す～ヘンダーソン氏の福音を～",
         authorName = "Schuld",

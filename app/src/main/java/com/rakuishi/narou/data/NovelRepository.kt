@@ -21,9 +21,7 @@ class NovelRepository(private val dao: NovelDao) {
     private fun latestEpisodeRegex(nid: String): Regex =
         Regex("""<dd class="subtitle">\s+<a href="/${nid}/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})<""")
 
-    suspend fun insert(novel: Novel) = dao.insert(novel)
-
-    suspend fun getItemById(id: Int): Novel? = dao.getItemById(id)
+    suspend fun getItemById(id: Long): Novel? = dao.getItemById(id)
 
     suspend fun insertNewNovel(url: String): Novel? {
         val regex = Regex("""^https://ncode.syosetu.com/([a-z0-9]+)/$""")
@@ -72,7 +70,7 @@ class NovelRepository(private val dao: NovelDao) {
                 && novel.authorName.isNotEmpty()
                 && novel.latestEpisodeNumber > 0
             ) {
-                dao.insert(novel)
+                novel.id = dao.insert(novel)
                 novel
             } else {
                 null
