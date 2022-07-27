@@ -68,10 +68,17 @@ fun HomeScreen(
                     )
                 }
             ) {
-                NovelList(items = viewModel.novelList.value) { novel ->
-                    viewModel.consumeHasNewEpisodeIfNeeded(novel)
-                    navController.navigate(Destination.createNovelRoute(novel.id))
-                }
+                NovelList(
+                    items = viewModel.novelList.value,
+                    { novel ->
+                        viewModel.consumeHasNewEpisodeIfNeeded(novel)
+                        navController.navigate(Destination.createNovelRoute(novel.id))
+                    },
+                    { novel ->
+                        // TODO: add a confirmation dialog
+                        viewModel.deleteNovel(novel)
+                    }
+                )
             }
 
             viewModel.fetchedAt.value?.let {
@@ -101,10 +108,18 @@ fun HomeScreen(
 }
 
 @Composable
-fun NovelList(items: List<Novel>, onNovelClicked: (novel: Novel) -> Unit) {
+fun NovelList(
+    items: List<Novel>,
+    onNovelClicked: (novel: Novel) -> Unit,
+    onNovelLongClicked: (novel: Novel) -> Unit,
+) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(items) { _, novel ->
-            NovelListItem(novel = novel, onNovelClicked = { onNovelClicked.invoke(novel) })
+            NovelListItem(
+                novel,
+                onNovelClicked,
+                onNovelLongClicked,
+            )
         }
     }
 }

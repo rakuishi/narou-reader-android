@@ -41,9 +41,20 @@ class HomeViewModel(
         viewModelScope.launch {
             val novel: Novel? = novelRepository.insertNewNovel(url)
             if (novel != null) {
-                fetchNovelList()
+                fetchNovelList(skipUpdateNewEpisode = true)
             } else {
                 snackbarHostState.value.showSnackbar(message = "The URL doesn\\'t match https://ncode.syosetu.com/***/")
+            }
+        }
+    }
+
+    fun deleteNovel(novel: Novel) {
+        viewModelScope.launch {
+            novelRepository.delete(novel.id)
+            fetchNovelList(skipUpdateNewEpisode = true)
+            val isSuccess = novelList.value.none { it.id == novel.id }
+            if (!isSuccess) {
+                snackbarHostState.value.showSnackbar(message = "Failed to delete the novel")
             }
         }
     }

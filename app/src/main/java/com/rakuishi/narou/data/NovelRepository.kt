@@ -21,6 +21,8 @@ class NovelRepository(private val dao: NovelDao) {
     private fun latestEpisodeRegex(nid: String): Regex =
         Regex("""<dd class="subtitle">\s+<a href="/${nid}/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})<""")
 
+    suspend fun delete(id: Long) = dao.delete(id)
+
     suspend fun getItemById(id: Long): Novel? = dao.getItemById(id)
 
     suspend fun insertNewNovel(url: String): Novel? {

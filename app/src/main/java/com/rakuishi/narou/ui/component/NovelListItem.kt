@@ -1,6 +1,7 @@
 package com.rakuishi.narou.ui.component
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -19,12 +20,20 @@ import com.rakuishi.narou.util.SampleDataProvider
 import java.text.SimpleDateFormat
 import java.util.*
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun NovelListItem(novel: Novel, onNovelClicked: (novel: Novel) -> Unit) {
+fun NovelListItem(
+    novel: Novel,
+    onNovelClicked: (novel: Novel) -> Unit,
+    onNovelLongClicked: (novel: Novel) -> Unit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onNovelClicked.invoke(novel) },
+            .combinedClickable(
+                onClick = { onNovelClicked.invoke(novel) },
+                onLongClick = { onNovelLongClicked.invoke(novel) },
+            ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
@@ -69,7 +78,8 @@ fun NovelListItemPreview() {
     NarouReaderTheme {
         NovelListItem(
             novel = SampleDataProvider.novel(),
-            onNovelClicked = {}
+            onNovelClicked = {},
+            onNovelLongClicked = {},
         )
     }
 }
