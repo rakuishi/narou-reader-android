@@ -5,8 +5,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -19,6 +23,7 @@ import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.Destination
 import com.rakuishi.narou.ui.component.NovelListItem
+import com.rakuishi.narou.ui.component.TextFieldDialog
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,24 +33,27 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
+    val openDialog = remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             SmallTopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
             )
         },
-        /*
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                // TODO: Show AlertDialog with TextField
+                openDialog.value = true
             }) {
                 Icon(
                     Icons.Default.Add,
                     contentDescription = stringResource(id = R.string.add_novel)
                 )
             }
-        }
-         */
+        },
+        snackbarHost = {
+            SnackbarHost(viewModel.snackbarHostState.value)
+        },
     ) {
         Box {
             SwipeRefresh(
@@ -80,6 +88,17 @@ fun HomeScreen(
                 )
             }
         }
+    }
+
+    if (openDialog.value) {
+        val error = stringResource(R.string.enter_url_error)
+
+        TextFieldDialog(
+            title = stringResource(R.string.enter_url_title),
+            placeholder = stringResource(R.string.enter_url_placeholder),
+            openDialog = openDialog,
+            onPositiveClick = { viewModel.insertNewNovel(it, error) }
+        )
     }
 }
 

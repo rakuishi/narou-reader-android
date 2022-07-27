@@ -25,7 +25,7 @@ class NovelRepository(private val dao: NovelDao) {
 
     suspend fun getItemById(id: Int): Novel? = dao.getItemById(id)
 
-    suspend fun fetchNewNovel(url: String): Novel? {
+    suspend fun insertNewNovel(url: String): Novel? {
         val regex = Regex("""^https://ncode.syosetu.com/([a-z0-9]+)/$""")
         val match = regex.find(url) ?: return null
         val nid = match.groups[1]?.value ?: return null
@@ -79,12 +79,14 @@ class NovelRepository(private val dao: NovelDao) {
             }
         }
 
-    suspend fun fetchList(): List<Novel> {
+    suspend fun fetchList(skipUpdateNewEpisode: Boolean): List<Novel> {
         val client = OkHttpClient()
         val novels = dao.getList()
 
-        novels.forEach { novel ->
-            fetchNewEpisodeFromNarouServer(novel, client)
+        if (!skipUpdateNewEpisode) {
+            novels.forEach { novel ->
+                fetchNewEpisodeFromNarouServer(novel, client)
+            }
         }
 
         return novels

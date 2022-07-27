@@ -6,4 +6,7 @@
     <string name="add_novel">Add novel</string>
     <string name="move_to_latest_episode">Latest episode</string>
     <string name="updated_on">Updated on %s</string>
+    <string name="enter_url_title">Enter a URL</string>
+    <string name="enter_url_placeholder">https://ncode.syosetu.com/***/</string>
+    <string name="enter_url_error">The URL doesn\'t match https://ncode.syosetu.com/***/</string>
 </resources>

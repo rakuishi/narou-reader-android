@@ -32,7 +32,7 @@ class NovelRepositoryTest {
 
     @Test
     fun fetchNewNovel() = runBlocking {
-        val novel = novelRepository.fetchNewNovel("https://ncode.syosetu.com/n9669bk/")
+        val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n9669bk/")
         assertEquals(novel?.title, "無職転生　- 異世界行ったら本気だす -")
         assertEquals(novel?.authorName, "理不尽な孫の手")
     }
