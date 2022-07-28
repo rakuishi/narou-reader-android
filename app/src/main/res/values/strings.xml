@@ -8,4 +8,7 @@
     <string name="updated_on">Updated on %s</string>
     <string name="enter_url_title">Enter a URL</string>
     <string name="enter_url_placeholder">https://ncode.syosetu.com/***/</string>
+    <string name="delete_dialog_title">Delete this novel?</string>
+    <string name="delete_dialog_message">This is permanent and can\'t be undone.</string>
+    <string name="delete">Delete</string>
 </resources>

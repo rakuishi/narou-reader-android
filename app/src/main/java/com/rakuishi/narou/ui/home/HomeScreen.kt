@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,6 +23,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.Destination
+import com.rakuishi.narou.ui.component.BasicDialog
 import com.rakuishi.narou.ui.component.NovelListItem
 import com.rakuishi.narou.ui.component.TextFieldDialog
 import java.text.SimpleDateFormat
@@ -33,7 +35,9 @@ fun HomeScreen(
     navController: NavController,
     viewModel: HomeViewModel,
 ) {
-    val openDialog = remember { mutableStateOf(false) }
+    val openInsertDialog = remember { mutableStateOf(false) }
+    val openDeleteDialog = remember { mutableStateOf(false) }
+    val targetNovel: MutableState<Novel?> = remember { mutableStateOf(null) }
 
     Scaffold(
         topBar = {
@@ -43,7 +47,7 @@ fun HomeScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                openDialog.value = true
+                openInsertDialog.value = true
             }) {
                 Icon(
                     Icons.Default.Add,
@@ -75,8 +79,8 @@ fun HomeScreen(
                         navController.navigate(Destination.createNovelRoute(novel.id))
                     },
                     { novel ->
-                        // TODO: add a confirmation dialog
-                        viewModel.deleteNovel(novel)
+                        targetNovel.value = novel
+                        openDeleteDialog.value = true
                     }
                 )
             }
@@ -97,12 +101,24 @@ fun HomeScreen(
         }
     }
 
-    if (openDialog.value) {
+    if (openInsertDialog.value) {
         TextFieldDialog(
             title = R.string.enter_url_title,
             placeholder = R.string.enter_url_placeholder,
-            openDialog = openDialog,
+            openDialog = openInsertDialog,
             onPositiveClick = { viewModel.insertNewNovel(it) }
+        )
+    }
+
+    if (openDeleteDialog.value) {
+        BasicDialog(
+            title = R.string.delete_dialog_title,
+            message = R.string.delete_dialog_message,
+            openDialog = openDeleteDialog,
+            onPositiveText = R.string.delete,
+            onPositiveClick = {
+                targetNovel.value?.let { viewModel.deleteNovel(it) }
+            }
         )
     }
 }
