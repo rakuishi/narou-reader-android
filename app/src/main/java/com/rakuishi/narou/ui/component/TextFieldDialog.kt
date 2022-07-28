@@ -1,6 +1,7 @@
 package com.rakuishi.narou.ui.component
 
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -10,13 +11,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import com.rakuishi.narou.R
 import com.rakuishi.narou.ui.theme.NarouReaderTheme
 
 @ExperimentalMaterial3Api
 @Composable
 fun TextFieldDialog(
-    title: String,
-    placeholder: String,
+    @StringRes title: Int,
+    @StringRes placeholder: Int,
     openDialog: MutableState<Boolean>,
     onPositiveClick: (String) -> Unit,
 ) {
@@ -25,14 +27,14 @@ fun TextFieldDialog(
     AlertDialog(
         onDismissRequest = { openDialog.value = false },
         title = {
-            Text(text = title)
+            Text(text = stringResource(title))
         },
         text = {
             TextField(
                 value = text.value,
                 placeholder = {
                     Text(
-                        text = placeholder,
+                        text = stringResource(placeholder),
                         maxLines = 1,
                         overflow = TextOverflow.Clip,
                     )
@@ -68,8 +70,8 @@ fun TextFieldDialogPreview() {
 
     NarouReaderTheme {
         TextFieldDialog(
-            title = "Title",
-            placeholder = "Placeholder",
+            title = R.string.enter_url_title,
+            placeholder = R.string.enter_url_placeholder,
             openDialog = openDialog,
             onPositiveClick = {
                 Toast.makeText(context, it, Toast.LENGTH_SHORT).show()

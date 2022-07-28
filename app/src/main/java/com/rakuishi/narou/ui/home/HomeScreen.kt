@@ -99,8 +99,8 @@ fun HomeScreen(
 
     if (openDialog.value) {
         TextFieldDialog(
-            title = stringResource(R.string.enter_url_title),
-            placeholder = stringResource(R.string.enter_url_placeholder),
+            title = R.string.enter_url_title,
+            placeholder = R.string.enter_url_placeholder,
             openDialog = openDialog,
             onPositiveClick = { viewModel.insertNewNovel(it) }
         )
