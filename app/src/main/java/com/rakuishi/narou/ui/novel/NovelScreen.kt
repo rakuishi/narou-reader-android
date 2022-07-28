@@ -129,8 +129,8 @@ fun NovelScreen(
 fun WebViewCompose(
     url: String,
     cookies: Map<String, String>,
-    onCreated: (WebView) -> Unit = {},
-    onUrlChanged: (String) -> Unit = {},
+    onCreate: (WebView) -> Unit = {},
+    onChangeUrl: (String) -> Unit = {},
 ) {
     AndroidView(
         factory = { context ->
@@ -140,7 +140,7 @@ fun WebViewCompose(
                         view: WebView?,
                         request: WebResourceRequest?
                     ): Boolean {
-                        request?.url?.let { onUrlChanged.invoke(it.toString()) }
+                        request?.url?.let { onChangeUrl.invoke(it.toString()) }
                         return super.shouldOverrideUrlLoading(view, request)
                     }
 
@@ -167,7 +167,7 @@ fun WebViewCompose(
 
                 loadUrl(url)
 
-                onCreated.invoke(this)
+                onCreate.invoke(this)
             }
         },
         update = {

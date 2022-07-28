@@ -110,15 +110,15 @@ fun HomeScreen(
 @Composable
 fun NovelList(
     items: List<Novel>,
-    onNovelClicked: (novel: Novel) -> Unit,
-    onNovelLongClicked: (novel: Novel) -> Unit,
+    onClickNovel: (novel: Novel) -> Unit,
+    onLongClickNovel: (novel: Novel) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         itemsIndexed(items) { _, novel ->
             NovelListItem(
                 novel,
-                onNovelClicked,
-                onNovelLongClicked,
+                onClickNovel,
+                onLongClickNovel,
             )
         }
     }

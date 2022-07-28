@@ -24,15 +24,15 @@ import java.util.*
 @Composable
 fun NovelListItem(
     novel: Novel,
-    onNovelClicked: (novel: Novel) -> Unit,
-    onNovelLongClicked: (novel: Novel) -> Unit,
+    onClickNovel: (novel: Novel) -> Unit,
+    onLongClickNovel: (novel: Novel) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { onNovelClicked.invoke(novel) },
-                onLongClick = { onNovelLongClicked.invoke(novel) },
+                onClick = { onClickNovel.invoke(novel) },
+                onLongClick = { onLongClickNovel.invoke(novel) },
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -78,8 +78,8 @@ fun NovelListItemPreview() {
     NarouReaderTheme {
         NovelListItem(
             novel = SampleDataProvider.novel(),
-            onNovelClicked = {},
-            onNovelLongClicked = {},
+            onClickNovel = {},
+            onLongClickNovel = {},
         )
     }
 }
