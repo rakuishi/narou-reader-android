@@ -8,12 +8,10 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -26,6 +24,8 @@ import com.rakuishi.narou.ui.Destination
 import com.rakuishi.narou.ui.component.BasicDialog
 import com.rakuishi.narou.ui.component.NovelListItem
 import com.rakuishi.narou.ui.component.TextFieldDialog
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,6 +38,15 @@ fun HomeScreen(
     val openInsertDialog = remember { mutableStateOf(false) }
     val openDeleteDialog = remember { mutableStateOf(false) }
     val targetNovel: MutableState<Novel?> = remember { mutableStateOf(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
+    LaunchedEffect(key1 = snackbarHostState) {
+        viewModel.snackbarMessageChannel.receiveAsFlow().collect {
+            val message = context.getString(it)
+            snackbarHostState.showSnackbar(message = message)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -55,9 +64,7 @@ fun HomeScreen(
                 )
             }
         },
-        snackbarHost = {
-            SnackbarHost(viewModel.snackbarHostState.value)
-        },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
         Box {
             SwipeRefresh(

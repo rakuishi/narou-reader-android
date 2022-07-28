@@ -11,4 +11,6 @@
     <string name="delete_dialog_title">Delete this novel?</string>
     <string name="delete_dialog_message">This is permanent and can\'t be undone.</string>
     <string name="delete">Delete</string>
+    <string name="insert_failed">The URL doesn\'t match https://ncode.syosetu.com/***/</string>
+    <string name="delete_failed">Failed to delete the novel</string>
 </resources>

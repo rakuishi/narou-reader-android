@@ -6,8 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.rakuishi.narou.R
 import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.model.Novel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.*
 
@@ -21,7 +24,7 @@ class HomeViewModel(
         private set
     var fetchedAt: MutableState<Date?> = mutableStateOf(null)
         private set
-    var snackbarHostState: MutableState<SnackbarHostState> = mutableStateOf(SnackbarHostState())
+    var snackbarMessageChannel = Channel<Int>()
         private set
 
     init {
@@ -43,7 +46,7 @@ class HomeViewModel(
             if (novel != null) {
                 novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
             } else {
-                snackbarHostState.value.showSnackbar(message = "The URL doesn\\'t match https://ncode.syosetu.com/***/")
+                snackbarMessageChannel.send(R.string.insert_failed)
             }
         }
     }
@@ -54,7 +57,7 @@ class HomeViewModel(
             novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
             val isSuccess = novelList.value.none { it.id == novel.id }
             if (!isSuccess) {
-                snackbarHostState.value.showSnackbar(message = "Failed to delete the novel")
+                snackbarMessageChannel.send(R.string.delete_failed)
             }
         }
     }
