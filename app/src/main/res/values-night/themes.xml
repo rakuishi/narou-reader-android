@@ -3,7 +3,7 @@
 
     <style name="Theme.NarouReader" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:windowSplashScreenBackground" tools:ignore="NewApi">
-            @color/day_background
+            @color/dark_background
         </item>
     </style>
 
