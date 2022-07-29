@@ -1,9 +1,6 @@
 package com.rakuishi.narou
 
-import android.content.Context
 import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.database.AppDatabase
 import com.rakuishi.narou.model.Novel
@@ -13,9 +10,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import java.util.*
 
-@RunWith(AndroidJUnit4::class)
+@RunWith(RobolectricTestRunner::class)
 class NovelRepositoryTest {
 
     private lateinit var database: AppDatabase
@@ -24,7 +23,7 @@ class NovelRepositoryTest {
 
     @Before
     fun setupRepository() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        val context = RuntimeEnvironment.getApplication()
         database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         novelRepository = NovelRepository(database.novelDao())
     }
