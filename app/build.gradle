@@ -89,3 +89,13 @@ dependencies {
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
 }
+
+/**
+ * To make the users of annotations @OptIn and @RequiresOptIn aware of their experimental status,
+ * the compiler raises warnings when compiling the code with these annotations:
+ * This class can only be used with the compiler argument '-Xopt-in=kotlin.RequiresOptIn'
+ * To remove the warnings, we add the compiler argument -Xopt-in=kotlin.RequiresOptIn.
+ */
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+}
