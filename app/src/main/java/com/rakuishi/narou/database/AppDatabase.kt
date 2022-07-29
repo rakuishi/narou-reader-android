@@ -16,7 +16,7 @@ import com.rakuishi.narou.util.SampleDataProvider
         Novel::class,
     ],
     version = 1,
-    exportSchema = true,
+    exportSchema = false,
 )
 @TypeConverters(
     DateConverter::class,
