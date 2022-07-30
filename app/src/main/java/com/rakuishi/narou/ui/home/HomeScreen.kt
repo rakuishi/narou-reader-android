@@ -11,7 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -40,6 +42,7 @@ fun HomeScreen(
     val targetNovel: MutableState<Novel?> = remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(key1 = snackbarHostState) {
         viewModel.snackbarMessageChannel.receiveAsFlow().collect {
@@ -86,6 +89,7 @@ fun HomeScreen(
                         navController.navigate(Destination.createNovelRoute(novel.id))
                     },
                     { novel ->
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         targetNovel.value = novel
                         openDeleteDialog.value = true
                     }
