@@ -29,8 +29,15 @@ class NovelRepositoryTest {
     }
 
     @Test
-    fun fetchNewNovel() = runBlocking {
+    fun insertNewNovelByUrl() = runBlocking {
         val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n9669bk/")
+        assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
+        assertEquals("理不尽な孫の手", novel?.authorName)
+    }
+
+    @Test
+    fun insertNewNovelByNid() = runBlocking {
+        val novel = novelRepository.insertNewNovel("n9669bk")
         assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
         assertEquals("理不尽な孫の手", novel?.authorName)
     }

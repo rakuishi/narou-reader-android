@@ -9,7 +9,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.rakuishi.narou.R
 import com.rakuishi.narou.ui.theme.NarouReaderTheme
@@ -35,8 +34,7 @@ fun TextFieldDialog(
                 placeholder = {
                     Text(
                         text = stringResource(placeholder),
-                        maxLines = 1,
-                        overflow = TextOverflow.Clip,
+                        softWrap = false,
                     )
                 },
                 singleLine = true,

@@ -25,9 +25,13 @@ class NovelRepository(private val dao: NovelDao) {
 
     suspend fun getItemById(id: Long): Novel? = dao.getItemById(id)
 
-    suspend fun insertNewNovel(url: String): Novel? {
-        val regex = Regex("""^https://ncode.syosetu.com/([a-z0-9]+)/$""")
-        val match = regex.find(url) ?: return null
+    suspend fun insertNewNovel(urlOrNid: String): Novel? {
+        val regex = if (urlOrNid.startsWith("https://")) {
+            Regex("""^https://ncode.syosetu.com/(n[a-z0-9]+)/$""")
+        } else {
+            Regex("""^(n[a-z0-9]+)$""")
+        }
+        val match = regex.find(urlOrNid) ?: return null
         val nid = match.groups[1]?.value ?: return null
         return fetchNewNovelFromNarouServer(nid)
     }
