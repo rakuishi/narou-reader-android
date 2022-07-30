@@ -1,8 +1,6 @@
 package com.rakuishi.narou.ui.home
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -69,45 +67,61 @@ fun HomeScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-        Box {
-            SwipeRefresh(
-                state = rememberSwipeRefreshState(viewModel.isRefreshing.value),
-                onRefresh = { viewModel.fetchNovelList() },
-                indicator = { state, trigger ->
-                    SwipeRefreshIndicator(
-                        state = state,
-                        refreshTriggerDistance = trigger,
-                        backgroundColor = MaterialTheme.colorScheme.background,
-                        contentColor = MaterialTheme.colorScheme.primary,
-                    )
-                }
+        if (viewModel.novelList.value.isEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
             ) {
-                NovelList(
-                    items = viewModel.novelList.value,
-                    { novel ->
-                        viewModel.consumeHasNewEpisodeIfNeeded(novel)
-                        navController.navigate(Destination.createNovelRoute(novel.id))
-                    },
-                    { novel ->
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        targetNovel.value = novel
-                        openDeleteDialog.value = true
-                    }
-                )
-            }
-
-            viewModel.fetchedAt.value?.let {
                 Text(
                     modifier = Modifier
-                        .align(alignment = Alignment.BottomCenter)
+                        .align(alignment = Alignment.Center)
                         .padding(bottom = 16.dp),
-                    text = stringResource(
-                        R.string.updated_on,
-                        SimpleDateFormat("MM/dd HH:mm", Locale.JAPAN).format(it)
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.secondary,
+                    text = stringResource(R.string.add_novel_from_fab),
+                    style = MaterialTheme.typography.bodyLarge,
                 )
+            }
+        } else {
+            Box {
+                SwipeRefresh(
+                    state = rememberSwipeRefreshState(viewModel.isRefreshing.value),
+                    onRefresh = { viewModel.fetchNovelList() },
+                    indicator = { state, trigger ->
+                        SwipeRefreshIndicator(
+                            state = state,
+                            refreshTriggerDistance = trigger,
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.primary,
+                        )
+                    }
+                ) {
+                    NovelList(
+                        items = viewModel.novelList.value,
+                        { novel ->
+                            viewModel.consumeHasNewEpisodeIfNeeded(novel)
+                            navController.navigate(Destination.createNovelRoute(novel.id))
+                        },
+                        { novel ->
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            targetNovel.value = novel
+                            openDeleteDialog.value = true
+                        }
+                    )
+                }
+
+                viewModel.fetchedAt.value?.let {
+                    Text(
+                        modifier = Modifier
+                            .align(alignment = Alignment.BottomCenter)
+                            .padding(bottom = 16.dp),
+                        text = stringResource(
+                            R.string.updated_on,
+                            SimpleDateFormat("MM/dd HH:mm", Locale.JAPAN).format(it)
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary,
+                    )
+                }
             }
         }
     }

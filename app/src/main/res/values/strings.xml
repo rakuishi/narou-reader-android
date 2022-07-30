@@ -13,4 +13,5 @@
     <string name="delete">Delete</string>
     <string name="insert_failed">The URL doesn\'t match https://ncode.syosetu.com/***/</string>
     <string name="delete_failed">Failed to delete the novel</string>
+    <string name="add_novel_from_fab">Add a novel from plus button.</string>
 </resources>
