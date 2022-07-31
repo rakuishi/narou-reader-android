@@ -7,6 +7,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.rakuishi.narou.database.AppDatabase
 import com.rakuishi.narou.repository.DataStoreRepository
 import com.rakuishi.narou.repository.NovelRepository
+import com.rakuishi.narou.util.NotificationHelper
+import com.rakuishi.narou.worker.NewEpisodeWorker
 import okhttp3.OkHttpClient
 
 class App : Application() {
@@ -24,5 +26,8 @@ class App : Application() {
         appDatabase = AppDatabase.getDatabase(this)
         novelRepository = NovelRepository(appDatabase.novelDao(), okHttpClient)
         dataStoreRepository = DataStoreRepository(dataStore)
+
+        NotificationHelper.setupNotificationChannel(this)
+        NewEpisodeWorker.enqueue(this)
     }
 }
