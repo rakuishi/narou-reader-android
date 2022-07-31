@@ -21,6 +21,7 @@ import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.Destination
+import com.rakuishi.narou.ui.UiState
 import com.rakuishi.narou.ui.component.BasicDialog
 import com.rakuishi.narou.ui.component.NovelListItem
 import com.rakuishi.narou.ui.component.TextFieldDialog
@@ -67,7 +68,7 @@ fun NovelListScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
-        if (viewModel.novelList.value.isEmpty()) {
+        if (viewModel.novelList.value.isEmpty() && viewModel.uiState.value == UiState.Success) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,7 +85,7 @@ fun NovelListScreen(
         } else {
             Box {
                 SwipeRefresh(
-                    state = rememberSwipeRefreshState(viewModel.isRefreshing.value),
+                    state = rememberSwipeRefreshState(viewModel.isRefreshing),
                     onRefresh = { viewModel.fetchNovelList() },
                     indicator = { state, trigger ->
                         SwipeRefreshIndicator(

@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import android.net.http.SslError
 import android.webkit.*
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -19,6 +22,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.rakuishi.narou.BuildConfig
 import com.rakuishi.narou.R
+import com.rakuishi.narou.ui.UiState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -103,7 +107,7 @@ fun NovelDetailScreen(
             )
         }
     ) {
-        if (viewModel.result.value.isSuccess) {
+        if (viewModel.uiState.value == UiState.Success) {
             val result = viewModel.result.value
             val novel = result.novel ?: throw NullPointerException()
             val cookies = result.cookies ?: throw NullPointerException()

@@ -5,9 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.repository.DataStoreRepository
 import com.rakuishi.narou.repository.NovelRepository
-import com.rakuishi.narou.model.Novel
+import com.rakuishi.narou.ui.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -19,12 +20,13 @@ class NovelDetailViewModel(
 ) : ViewModel() {
 
     class Result(
-        var isSuccess: Boolean = true,
         val novel: Novel? = null,
         val cookies: Map<String, String>? = null
     )
 
-    var result: MutableState<Result> = mutableStateOf(Result(isSuccess = false))
+    var uiState: MutableState<UiState> = mutableStateOf(UiState.Initial)
+        private set
+    var result: MutableState<Result> = mutableStateOf(Result())
         private set
 
     init {
@@ -32,7 +34,8 @@ class NovelDetailViewModel(
             val novel = novelRepository.getItemById(novelId) ?: return@launch
             val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
             delay(400L) // for smooth transition
-            result.value = Result(isSuccess = true, novel, cookies)
+            result.value = Result(novel, cookies)
+            uiState.value = UiState.Success
         }
     }
 

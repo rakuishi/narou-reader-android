@@ -6,8 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.rakuishi.narou.R
-import com.rakuishi.narou.repository.NovelRepository
 import com.rakuishi.narou.model.Novel
+import com.rakuishi.narou.repository.NovelRepository
+import com.rakuishi.narou.ui.UiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -16,7 +17,7 @@ class NovelListViewModel(
     private val novelRepository: NovelRepository,
 ) : ViewModel() {
 
-    var isRefreshing: MutableState<Boolean> = mutableStateOf(false)
+    var uiState: MutableState<UiState> = mutableStateOf(UiState.Initial)
         private set
     var novelList: MutableState<List<Novel>> = mutableStateOf(arrayListOf())
         private set
@@ -25,16 +26,19 @@ class NovelListViewModel(
     var snackbarMessageChannel = Channel<Int>()
         private set
 
+    val isRefreshing: Boolean
+        get() = uiState.value == UiState.Loading
+
     init {
         fetchNovelList()
     }
 
     fun fetchNovelList(skipUpdateNewEpisode: Boolean = false) {
         viewModelScope.launch {
-            isRefreshing.value = true
+            uiState.value = UiState.Loading
             novelList.value = novelRepository.fetchList(skipUpdateNewEpisode)
             fetchedAt.value = Date()
-            isRefreshing.value = false
+            uiState.value = UiState.Success
         }
     }
 
