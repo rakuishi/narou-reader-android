@@ -1,4 +1,4 @@
-package com.rakuishi.narou.ui.novel
+package com.rakuishi.narou.ui.novel_detail
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class NovelViewModel(
+class NovelDetailViewModel(
     private val novelRepository: NovelRepository,
     private val dataStoreRepository: DataStoreRepository,
     novelId: Long,
@@ -57,7 +57,7 @@ class NovelViewModel(
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return NovelViewModel(novelRepository, dataStoreRepository, novelId) as T
+                return NovelDetailViewModel(novelRepository, dataStoreRepository, novelId) as T
             }
         }
     }

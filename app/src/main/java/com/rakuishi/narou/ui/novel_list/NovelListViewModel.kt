@@ -1,4 +1,4 @@
-package com.rakuishi.narou.ui.home
+package com.rakuishi.narou.ui.novel_list
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -12,7 +12,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.*
 
-class HomeViewModel(
+class NovelListViewModel(
     private val novelRepository: NovelRepository,
 ) : ViewModel() {
 
@@ -73,7 +73,7 @@ class HomeViewModel(
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return HomeViewModel(repository) as T
+                return NovelListViewModel(repository) as T
             }
         }
     }

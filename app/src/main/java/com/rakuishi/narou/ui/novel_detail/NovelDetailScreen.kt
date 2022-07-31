@@ -1,4 +1,4 @@
-package com.rakuishi.narou.ui.novel
+package com.rakuishi.narou.ui.novel_detail
 
 import android.annotation.SuppressLint
 import android.net.http.SslError
@@ -23,9 +23,9 @@ import com.rakuishi.narou.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NovelScreen(
+fun NovelDetailScreen(
     navController: NavController,
-    viewModel: NovelViewModel,
+    viewModel: NovelDetailViewModel,
 ) {
     var currentUrl: String? = null
     var showMenu by remember { mutableStateOf(false) }

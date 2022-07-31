@@ -11,28 +11,28 @@ import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.rakuishi.narou.App
-import com.rakuishi.narou.ui.home.HomeScreen
-import com.rakuishi.narou.ui.home.HomeViewModel
-import com.rakuishi.narou.ui.novel.NovelScreen
-import com.rakuishi.narou.ui.novel.NovelViewModel
+import com.rakuishi.narou.ui.novel_detail.NovelDetailScreen
+import com.rakuishi.narou.ui.novel_detail.NovelDetailViewModel
+import com.rakuishi.narou.ui.novel_list.NovelListScreen
+import com.rakuishi.narou.ui.novel_list.NovelListViewModel
 
 object Destination {
-    const val HOME_ROUTE = "home"
+    const val NOVEL_LIST_ROUTE = "novels"
     const val NOVEL_ID = "novel_id"
-    const val NOVEL_ROUTE = "novel/{${NOVEL_ID}}"
+    const val NOVEL_DETAIL_ROUTE = "novels/{${NOVEL_ID}}"
 
-    fun createNovelRoute(novelId: Long): String = "novel/$novelId"
+    fun createNovelRoute(novelId: Long): String = "novels/$novelId"
 }
 
 @ExperimentalAnimationApi
 @Composable
-fun AppNavHost(
+fun MainNavHost(
     app: App,
     navController: NavHostController,
 ) {
     AnimatedNavHost(
         navController = navController,
-        startDestination = Destination.HOME_ROUTE,
+        startDestination = Destination.NOVEL_LIST_ROUTE,
         enterTransition = {
             fadeIn()
         },
@@ -46,23 +46,23 @@ fun AppNavHost(
             fadeOut()
         },
     ) {
-        composable(Destination.HOME_ROUTE) {
-            HomeScreen(
+        composable(Destination.NOVEL_LIST_ROUTE) {
+            NovelListScreen(
                 navController,
                 viewModel(
-                    factory = HomeViewModel.provideFactory(app.novelRepository)
+                    factory = NovelListViewModel.provideFactory(app.novelRepository)
                 )
             )
         }
         composable(
-            Destination.NOVEL_ROUTE,
+            Destination.NOVEL_DETAIL_ROUTE,
             arguments = listOf(navArgument(Destination.NOVEL_ID) { type = NavType.LongType })
         ) { backStackEntry ->
             val novelId = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0
-            NovelScreen(
+            NovelDetailScreen(
                 navController,
                 viewModel(
-                    factory = NovelViewModel.provideFactory(
+                    factory = NovelDetailViewModel.provideFactory(
                         app.novelRepository,
                         app.dataStoreRepository,
                         novelId

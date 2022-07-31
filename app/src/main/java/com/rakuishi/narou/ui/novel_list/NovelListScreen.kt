@@ -1,4 +1,4 @@
-package com.rakuishi.narou.ui.home
+package com.rakuishi.narou.ui.novel_list
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,9 +31,9 @@ import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(
+fun NovelListScreen(
     navController: NavController,
-    viewModel: HomeViewModel,
+    viewModel: NovelListViewModel,
 ) {
     val openInsertDialog = remember { mutableStateOf(false) }
     val openDeleteDialog = remember { mutableStateOf(false) }
