@@ -1,4 +1,4 @@
-package com.rakuishi.narou.data
+package com.rakuishi.narou.repository
 
 import com.rakuishi.narou.database.NovelDao
 import com.rakuishi.narou.model.Novel
@@ -11,7 +11,10 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NovelRepository(private val dao: NovelDao) {
+class NovelRepository(
+    private val dao: NovelDao,
+    private val client: OkHttpClient,
+) {
 
     private val titleRegex =
         Regex("""<meta property="og:title" content="(.+?)" />""")
@@ -39,7 +42,6 @@ class NovelRepository(private val dao: NovelDao) {
     @Suppress("BlockingMethodInNonBlockingContext")
     suspend fun fetchNewNovelFromNarouServer(nid: String) =
         withContext(Dispatchers.IO) {
-            val client = OkHttpClient()
             val url = "https://ncode.syosetu.com/${nid}/"
             val request = Request.Builder().url(url).get().build()
             val response = client.newCall(request).await()
@@ -84,12 +86,11 @@ class NovelRepository(private val dao: NovelDao) {
         }
 
     suspend fun fetchList(skipUpdateNewEpisode: Boolean): List<Novel> {
-        val client = OkHttpClient()
         val novels = dao.getList()
 
         if (!skipUpdateNewEpisode) {
             novels.forEach { novel ->
-                fetchNewEpisodeFromNarouServer(novel, client)
+                fetchNewEpisodeFromNarouServer(novel)
             }
         }
 
@@ -97,7 +98,7 @@ class NovelRepository(private val dao: NovelDao) {
     }
 
     @Suppress("BlockingMethodInNonBlockingContext")
-    suspend fun fetchNewEpisodeFromNarouServer(novel: Novel, client: OkHttpClient) =
+    suspend fun fetchNewEpisodeFromNarouServer(novel: Novel) =
         withContext(Dispatchers.IO) {
             val request = Request.Builder().url(novel.url).get().build()
             val response = client.newCall(request).await()

@@ -1,16 +1,14 @@
 package com.rakuishi.narou.ui.home
 
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.rakuishi.narou.R
-import com.rakuishi.narou.data.NovelRepository
+import com.rakuishi.narou.repository.NovelRepository
 import com.rakuishi.narou.model.Novel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.util.*
 

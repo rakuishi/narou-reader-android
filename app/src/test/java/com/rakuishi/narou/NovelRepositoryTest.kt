@@ -1,9 +1,9 @@
 package com.rakuishi.narou
 
 import androidx.room.Room
-import com.rakuishi.narou.data.NovelRepository
 import com.rakuishi.narou.database.AppDatabase
 import com.rakuishi.narou.model.Novel
+import com.rakuishi.narou.repository.NovelRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import org.junit.Assert.assertEquals
@@ -25,7 +25,7 @@ class NovelRepositoryTest {
     fun setupRepository() {
         val context = RuntimeEnvironment.getApplication()
         database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        novelRepository = NovelRepository(database.novelDao())
+        novelRepository = NovelRepository(database.novelDao(), okHttpClient)
     }
 
     @Test
@@ -55,7 +55,7 @@ class NovelRepositoryTest {
             currentEpisodeNumber = 1,
             hasNewEpisode = false,
         )
-        novelRepository.fetchNewEpisodeFromNarouServer(novel, okHttpClient)
+        novelRepository.fetchNewEpisodeFromNarouServer(novel)
         assertEquals(novel.latestEpisodeNumber, 286)
     }
 

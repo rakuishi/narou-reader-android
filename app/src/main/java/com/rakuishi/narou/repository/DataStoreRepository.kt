@@ -1,4 +1,4 @@
-package com.rakuishi.narou.data
+package com.rakuishi.narou.repository
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.rakuishi.narou.data.DataStoreRepository
-import com.rakuishi.narou.data.NovelRepository
+import com.rakuishi.narou.repository.DataStoreRepository
+import com.rakuishi.narou.repository.NovelRepository
 import com.rakuishi.narou.model.Novel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
