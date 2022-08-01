@@ -100,7 +100,12 @@ fun NovelListScreen(
                         items = viewModel.novelList.value,
                         { novel ->
                             viewModel.consumeHasNewEpisodeIfNeeded(novel)
-                            navController.navigate(Destination.createNovelRoute(novel.id))
+                            navController.navigate(
+                                Destination.createNovelDetailRoute(
+                                    novel.id,
+                                    novel.currentEpisodeNumber
+                                )
+                            )
                         },
                         { novel ->
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)

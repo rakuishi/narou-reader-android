@@ -51,7 +51,7 @@ fun NovelDetailScreen(
             SmallTopAppBar(
                 title = {
                     Text(
-                        text = viewModel.result.value.novel?.title ?: "",
+                        text = viewModel.content.value.novel?.title ?: "",
                         maxLines = 1,
                     )
                 },
@@ -95,7 +95,7 @@ fun NovelDetailScreen(
                                 }
                             },
                             onClick = {
-                                viewModel.result.value.novel?.latestEpisodeUrl?.let {
+                                viewModel.content.value.novel?.latestEpisodeUrl?.let {
                                     updateCurrentUrl(it)
                                     webView?.loadUrl(it)
                                 }
@@ -108,14 +108,14 @@ fun NovelDetailScreen(
         }
     ) {
         if (viewModel.uiState.value == UiState.Success) {
-            val result = viewModel.result.value
-            val novel = result.novel ?: throw NullPointerException()
-            val cookies = result.cookies ?: throw NullPointerException()
+            val content = viewModel.content.value
+            val url = content.url ?: throw NullPointerException()
+            val cookies = content.cookies ?: throw NullPointerException()
 
-            currentUrl = novel.currentEpisodeUrl
+            currentUrl = url
 
             WebViewCompose(
-                novel.currentEpisodeUrl,
+                url,
                 cookies,
                 { webView = it },
                 { updateCurrentUrl(it) }

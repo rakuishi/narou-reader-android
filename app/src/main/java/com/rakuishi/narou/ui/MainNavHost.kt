@@ -19,9 +19,11 @@ import com.rakuishi.narou.ui.novel_list.NovelListViewModel
 object Destination {
     const val NOVEL_LIST_ROUTE = "novels"
     const val NOVEL_ID = "novel_id"
-    const val NOVEL_DETAIL_ROUTE = "novels/{${NOVEL_ID}}"
+    const val EPISODE_NUMBER = "episode_number"
+    const val NOVEL_DETAIL_ROUTE = "novels/{$NOVEL_ID}/episodes/{$EPISODE_NUMBER}"
 
-    fun createNovelRoute(novelId: Long): String = "novels/$novelId"
+    fun createNovelDetailRoute(nid: Long, episodeNumber: Int): String =
+        "novels/$nid/episodes/$episodeNumber"
 }
 
 @ExperimentalAnimationApi
@@ -56,16 +58,22 @@ fun MainNavHost(
         }
         composable(
             Destination.NOVEL_DETAIL_ROUTE,
-            arguments = listOf(navArgument(Destination.NOVEL_ID) { type = NavType.LongType })
+            arguments = listOf(
+                navArgument(Destination.NOVEL_ID) { type = NavType.LongType },
+                navArgument(Destination.EPISODE_NUMBER) { type = NavType.IntType }
+            )
         ) { backStackEntry ->
-            val novelId = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0
+            val nid = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0L
+            val episodeNumber = backStackEntry.arguments?.getInt(Destination.EPISODE_NUMBER) ?: 0
+
             NovelDetailScreen(
                 navController,
                 viewModel(
                     factory = NovelDetailViewModel.provideFactory(
                         app.novelRepository,
                         app.dataStoreRepository,
-                        novelId
+                        nid,
+                        episodeNumber
                     )
                 )
             )

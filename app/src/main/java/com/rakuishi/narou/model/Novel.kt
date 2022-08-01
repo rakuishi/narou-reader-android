@@ -20,9 +20,9 @@ data class Novel(
     val url: String
         get() = "https://ncode.syosetu.com/${nid}/"
 
-    val currentEpisodeUrl: String
-        get() = "https://ncode.syosetu.com/${nid}/${currentEpisodeNumber}/"
-
     val latestEpisodeUrl: String
         get() = "https://ncode.syosetu.com/${nid}/${latestEpisodeNumber}/"
+
+    fun getEpisodeUrl(episodeNumber: Int): String =
+        "https://ncode.syosetu.com/${nid}/${episodeNumber}/"
 }

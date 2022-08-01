@@ -17,16 +17,18 @@ class NovelDetailViewModel(
     private val novelRepository: NovelRepository,
     private val dataStoreRepository: DataStoreRepository,
     novelId: Long,
+    episodeNumber: Int,
 ) : ViewModel() {
 
-    class Result(
+    class Content(
         val novel: Novel? = null,
+        val url: String? = null,
         val cookies: Map<String, String>? = null
     )
 
     var uiState: MutableState<UiState> = mutableStateOf(UiState.Initial)
         private set
-    var result: MutableState<Result> = mutableStateOf(Result())
+    var content: MutableState<Content> = mutableStateOf(Content())
         private set
 
     init {
@@ -34,7 +36,11 @@ class NovelDetailViewModel(
             val novel = novelRepository.getItemById(novelId) ?: return@launch
             val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
             delay(400L) // for smooth transition
-            result.value = Result(novel, cookies)
+            content.value = Content(
+                novel,
+                novel.getEpisodeUrl(episodeNumber),
+                cookies
+            )
             uiState.value = UiState.Success
         }
     }
@@ -57,10 +63,16 @@ class NovelDetailViewModel(
             novelRepository: NovelRepository,
             dataStoreRepository: DataStoreRepository,
             novelId: Long,
+            episodeNumber: Int,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return NovelDetailViewModel(novelRepository, dataStoreRepository, novelId) as T
+                return NovelDetailViewModel(
+                    novelRepository,
+                    dataStoreRepository,
+                    novelId,
+                    episodeNumber,
+                ) as T
             }
         }
     }
