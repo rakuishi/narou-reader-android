@@ -24,6 +24,9 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <data
+                    android:host="novels"
+                    android:scheme="narou" />
             </intent-filter>
         </activity>
 

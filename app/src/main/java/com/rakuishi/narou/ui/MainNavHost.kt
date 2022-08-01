@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.rakuishi.narou.App
@@ -61,7 +62,13 @@ fun MainNavHost(
             arguments = listOf(
                 navArgument(Destination.NOVEL_ID) { type = NavType.LongType },
                 navArgument(Destination.EPISODE_NUMBER) { type = NavType.IntType }
-            )
+            ),
+            deepLinks = listOf(
+                navDeepLink {
+                    uriPattern =
+                        "narou://novels/{${Destination.NOVEL_ID}}/episodes/{${Destination.EPISODE_NUMBER}}"
+                }
+            ),
         ) { backStackEntry ->
             val nid = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0L
             val episodeNumber = backStackEntry.arguments?.getInt(Destination.EPISODE_NUMBER) ?: 0
