@@ -47,17 +47,17 @@ class NewEpisodeWorker(
         }
 
         val appContext = (applicationContext as App)
-        val list = appContext.novelRepository.fetchList(false)
+        val novels = appContext.novelRepository.fetchList(false)
         val compareTo =
             Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(REPEAT_INTERVAL_MINUTES))
-        val hasNewEpisode = list.filter {
+        val newEpisodeNovels = novels.filter {
             it.latestEpisodeUpdatedAt.after(compareTo)
         }
 
-        Log.d(TAG, "doWork: hasNewEpisode ${hasNewEpisode.isNotEmpty()}")
+        Log.d(TAG, "doWork: hasNewEpisode ${newEpisodeNovels.isNotEmpty()}")
 
-        if (hasNewEpisode.isNotEmpty()) {
-            NotificationHelper.notifyNewEpisode(appContext, list.first())
+        if (newEpisodeNovels.isNotEmpty()) {
+            NotificationHelper.notifyNewEpisode(appContext, newEpisodeNovels.first())
         }
 
         return Result.success()
