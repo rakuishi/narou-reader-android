@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.net.http.SslError
 import android.webkit.*
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -30,6 +32,7 @@ fun NovelDetailScreen(
     var currentUrl: String? = null
     var showMenu by remember { mutableStateOf(false) }
     var webView by remember { mutableStateOf<WebView?>(null) }
+    var progress by remember { mutableStateOf(0f) }
     val saveCookies = {
         currentUrl?.let {
             viewModel.saveCookies(it, CookieManager.getInstance().getCookie(it))
@@ -85,19 +88,30 @@ fun NovelDetailScreen(
             )
         }
     ) {
-        if (viewModel.uiState.value == UiState.Success) {
-            val content = viewModel.content.value
-            val url = content.url ?: throw NullPointerException()
-            val cookies = content.cookies ?: throw NullPointerException()
 
-            currentUrl = url
+        Box {
+            if (viewModel.uiState.value == UiState.Success) {
+                val content = viewModel.content.value
+                val url = content.url ?: throw NullPointerException()
+                val cookies = content.cookies ?: throw NullPointerException()
 
-            WebViewCompose(
-                url,
-                cookies,
-                { webView = it },
-                { updateCurrentUrl(it) }
-            )
+                currentUrl = url
+
+                WebViewCompose(
+                    url,
+                    cookies,
+                    { webView = it },
+                    { updateCurrentUrl(it) },
+                    { progress = it }
+                )
+            }
+
+            if (progress != 1f) {
+                LinearProgressIndicator(
+                    progress = progress,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 
@@ -117,7 +131,8 @@ fun WebViewCompose(
     url: String,
     cookies: Map<String, String>,
     onCreate: (WebView) -> Unit = {},
-    onChangeUrl: (String) -> Unit = {},
+    onChangeUrl: (url: String) -> Unit = {},
+    onChangeProgress: (progress: Float) -> Unit = {},
 ) {
     AndroidView(
         factory = { context ->
@@ -143,6 +158,11 @@ fun WebViewCompose(
                         } else {
                             super.onReceivedSslError(view, handler, error)
                         }
+                    }
+                }
+                webChromeClient = object : WebChromeClient() {
+                    override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                        onChangeProgress.invoke(newProgress.toFloat() / 100f)
                     }
                 }
                 settings.javaScriptEnabled = true
