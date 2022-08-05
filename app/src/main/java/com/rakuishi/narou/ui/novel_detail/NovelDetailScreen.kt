@@ -4,25 +4,21 @@ import android.annotation.SuppressLint
 import android.net.http.SslError
 import android.webkit.*
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.rakuishi.narou.BuildConfig
 import com.rakuishi.narou.R
 import com.rakuishi.narou.ui.UiState
+import com.rakuishi.narou.ui.component.IconDropdownMenuItem
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,12 +30,10 @@ fun NovelDetailScreen(
     var currentUrl: String? = null
     var showMenu by remember { mutableStateOf(false) }
     var webView by remember { mutableStateOf<WebView?>(null) }
-
-    val popBackStackAndSaveCookieSettings = {
+    val saveCookies = {
         currentUrl?.let {
             viewModel.saveCookies(it, CookieManager.getInstance().getCookie(it))
         }
-        navController.popBackStack()
     }
     val updateCurrentUrl: (url: String) -> Unit = {
         currentUrl = it
@@ -57,7 +51,8 @@ fun NovelDetailScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = {
-                        popBackStackAndSaveCookieSettings.invoke()
+                        saveCookies.invoke()
+                        navController.popBackStack()
                     }) {
                         Icon(
                             Icons.Default.ArrowBack,
@@ -73,35 +68,18 @@ fun NovelDetailScreen(
                     DropdownMenu(
                         expanded = showMenu,
                         onDismissRequest = { showMenu = false },
-                        modifier = Modifier.width(200.dp),
+                        modifier = Modifier.width(180.dp),
                     ) {
-                        DropdownMenuItem(
-                            text = {
-                                Row(
-                                    modifier = Modifier.wrapContentWidth()
-                                )
-                                {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ic_new_episode_24),
-                                        contentDescription = stringResource(R.string.move_to_latest_episode)
-                                    )
-                                    Text(
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        text = stringResource(R.string.move_to_latest_episode),
-                                        modifier = Modifier.padding(start = 16.dp),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                            },
-                            onClick = {
-                                viewModel.content.value.novel?.latestEpisodeUrl?.let {
-                                    updateCurrentUrl(it)
-                                    webView?.loadUrl(it)
-                                }
-                                showMenu = false
+                        IconDropdownMenuItem(
+                            textResId = R.string.move_to_latest_episode,
+                            iconResId = R.drawable.ic_new_episode_24
+                        ) {
+                            viewModel.content.value.novel?.latestEpisodeUrl?.let {
+                                updateCurrentUrl(it)
+                                webView?.loadUrl(it)
                             }
-                        )
+                            showMenu = false
+                        }
                     }
                 }
             )
@@ -124,7 +102,12 @@ fun NovelDetailScreen(
     }
 
     BackHandler {
-        popBackStackAndSaveCookieSettings.invoke()
+        if (webView?.canGoBack() == true) {
+            webView?.goBack()
+        } else {
+            saveCookies.invoke()
+            navController.popBackStack()
+        }
     }
 }
 
