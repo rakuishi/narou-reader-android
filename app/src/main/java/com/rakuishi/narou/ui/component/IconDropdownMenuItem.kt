@@ -4,17 +4,17 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.rakuishi.narou.R
+import com.rakuishi.narou.ui.theme.NarouReaderTheme
 
 @Composable
 fun IconDropdownMenuItem(
@@ -25,12 +25,14 @@ fun IconDropdownMenuItem(
     DropdownMenuItem(
         text = {
             Row(
-                modifier = Modifier.wrapContentWidth()
+                modifier = Modifier
+                    .wrapContentSize(unbounded = true)
+                    .padding(horizontal = 16.dp)
             )
             {
                 Icon(
                     painter = painterResource(iconResId),
-                    contentDescription = stringResource(textResId)
+                    contentDescription = stringResource(textResId),
                 )
                 Text(
                     style = MaterialTheme.typography.bodyLarge,
@@ -43,4 +45,20 @@ fun IconDropdownMenuItem(
         },
         onClick = onClick,
     )
+}
+
+@Preview
+@Composable
+fun IconDropdownMenuItemPreview() {
+    NarouReaderTheme {
+        DropdownMenu(
+            expanded = true,
+            onDismissRequest = {},
+        ) {
+            IconDropdownMenuItem(
+                textResId = R.string.move_to_latest_episode,
+                iconResId = R.drawable.ic_new_episode_24
+            ) {}
+        }
+    }
 }
