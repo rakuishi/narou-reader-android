@@ -5,14 +5,13 @@
     <string name="has_new_episode">New episode!</string>
     <string name="add_novel">Add novel</string>
     <string name="move_to_latest_episode">Latest episode</string>
-    <string name="refresh">Refresh</string>
     <string name="updated_on">Updated on %s</string>
-    <string name="enter_url_title">Enter a URL</string>
+    <string name="enter_url_title">Enter a ncode</string>
     <string name="enter_url_placeholder">n*** or https://ncode.syosetu.com/n***/</string>
+    <string name="insert_failed">The ncode or URL doesn\'t match n*** or https://ncode.syosetu.com/***/</string>
     <string name="delete_dialog_title">Delete this novel?</string>
     <string name="delete_dialog_message">This is permanent and can\'t be undone.</string>
     <string name="delete">Delete</string>
-    <string name="insert_failed">The URL doesn\'t match https://ncode.syosetu.com/***/</string>
     <string name="delete_failed">Failed to delete the novel</string>
     <string name="add_novel_from_fab">Add a novel from plus button.</string>
     <string name="notification_channel_new_episode">New episode</string>

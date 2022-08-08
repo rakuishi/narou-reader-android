@@ -25,6 +25,7 @@ import com.rakuishi.narou.ui.UiState
 import com.rakuishi.narou.ui.component.BasicDialog
 import com.rakuishi.narou.ui.component.NovelListItem
 import com.rakuishi.narou.ui.component.TextFieldDialog
+import com.rakuishi.narou.util.LocaleUtil
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.text.SimpleDateFormat
@@ -122,7 +123,10 @@ fun NovelListScreen(
                             .padding(bottom = 16.dp),
                         text = stringResource(
                             R.string.updated_on,
-                            SimpleDateFormat("MM/dd HH:mm", Locale.JAPAN).format(it)
+                            SimpleDateFormat(
+                                if (LocaleUtil.isJa()) "M月d日 HH:mm" else "HH:mm, d LLLL",
+                                if (LocaleUtil.isJa()) Locale.JAPAN else Locale.US
+                            ).format(it)
                         ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.secondary,

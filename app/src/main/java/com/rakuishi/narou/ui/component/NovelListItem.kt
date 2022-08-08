@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.theme.NarouReaderTheme
+import com.rakuishi.narou.util.LocaleUtil
 import com.rakuishi.narou.util.SampleDataProvider
 import java.text.SimpleDateFormat
 import java.util.*
@@ -51,8 +52,8 @@ fun NovelListItem(
                     novel.currentEpisodeNumber,
                     novel.latestEpisodeNumber,
                     SimpleDateFormat(
-                        "MM/dd HH:mm",
-                        Locale.JAPAN
+                        if (LocaleUtil.isJa()) "yyyy年M月d日" else "d LLLL yyyy",
+                        if (LocaleUtil.isJa()) Locale.JAPAN else Locale.US
                     ).format(novel.latestEpisodeUpdatedAt)
                 ),
                 style = MaterialTheme.typography.bodyMedium,

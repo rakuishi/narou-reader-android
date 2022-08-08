@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">なろうリーダー</string>
+    <string name="back">戻る</string>
+    <string name="novel_latest_episode_meta">%d/%d 話・%s更新</string>
+    <string name="has_new_episode">最新話</string>
+    <string name="add_novel">小説を追加</string>
+    <string name="move_to_latest_episode">最新話に移動</string>
+    <string name="updated_on">%s 更新</string>
+    <string name="enter_url_title">ncode を入力</string>
+    <string name="enter_url_placeholder">n*** もしくは https://ncode.syosetu.com/n***/</string>
+    <string name="insert_failed">n*** もしくは https://ncode.syosetu.com/***/ にマッチしませんでした。</string>
+    <string name="delete_dialog_title">小説を削除しますか？</string>
+    <string name="delete_dialog_message">この操作は取り消せません。</string>
+    <string name="delete">削除</string>
+    <string name="delete_failed">小説の削除に失敗しました。</string>
+    <string name="add_novel_from_fab">小説をプラスボタンから追加できます。</string>
+    <string name="notification_channel_new_episode">最新話</string>
+    <string name="notification_channel_new_episode_description">最新話：%s</string>
+</resources>
