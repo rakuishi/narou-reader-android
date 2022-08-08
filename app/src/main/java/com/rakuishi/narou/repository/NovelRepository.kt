@@ -3,8 +3,7 @@ package com.rakuishi.narou.repository
 import com.rakuishi.narou.database.NovelDao
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.util.await
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.text.ParseException
@@ -89,8 +88,8 @@ class NovelRepository(
         val novels = dao.getList()
 
         if (!skipUpdateNewEpisode) {
-            novels.forEach { novel ->
-                fetchNewEpisodeFromNarouServer(novel)
+            coroutineScope {
+                novels.map { async { fetchNewEpisodeFromNarouServer(it) } }.awaitAll()
             }
         }
 
