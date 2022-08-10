@@ -1,6 +1,8 @@
 package com.rakuishi.narou.ui.novel_detail
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.net.Uri
 import android.net.http.SslError
 import android.webkit.*
 import androidx.activity.compose.BackHandler
@@ -12,6 +14,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
@@ -27,6 +30,7 @@ fun NovelDetailScreen(
     navController: NavController,
     viewModel: NovelDetailViewModel,
 ) {
+    val context = LocalContext.current
     var currentUrl: String? = null
     var showMenu by remember { mutableStateOf(false) }
     var webView by remember { mutableStateOf<WebView?>(null) }
@@ -78,6 +82,14 @@ fun NovelDetailScreen(
                                 updateCurrentUrl(it)
                                 webView?.loadUrl(it)
                             }
+                            showMenu = false
+                        }
+                        IconDropdownMenuItem(
+                            textResId = R.string.open_in_chrome,
+                            iconResId = R.drawable.ic_share_24
+                        ) {
+                            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(currentUrl))
+                            context.startActivity(intent)
                             showMenu = false
                         }
                     }

@@ -48,7 +48,7 @@ class NovelListViewModel(
             if (novel != null) {
                 novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
             } else {
-                snackbarMessageChannel.send(R.string.insert_failed)
+                snackbarMessageChannel.send(R.string.enter_url_failed)
             }
         }
     }
