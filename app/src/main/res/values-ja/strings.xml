@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">なろうリーダー</string>
+    <string name="app_name">N Reader</string>
     <string name="back">戻る</string>
     <string name="novel_latest_episode_meta">%d/%d 話・%s更新</string>
     <string name="has_new_episode">最新話</string>

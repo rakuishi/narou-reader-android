@@ -53,7 +53,7 @@ fun NovelListScreen(
 
     Scaffold(
         topBar = {
-            SmallTopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(R.string.app_name)) },
             )
         },
