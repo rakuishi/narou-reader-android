@@ -175,7 +175,6 @@ fun WebViewCompose(
                     }
                 }
                 settings.javaScriptEnabled = true
-                settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
 
                 val cookieManager = CookieManager.getInstance()
                 cookies.forEach { (key, value) -> cookieManager.setCookie(key, value) }
