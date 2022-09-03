@@ -1,5 +1,10 @@
 package com.rakuishi.narou.ui.novel_list
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -12,8 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
@@ -26,7 +35,6 @@ import com.rakuishi.narou.ui.component.BasicDialog
 import com.rakuishi.narou.ui.component.NovelListItem
 import com.rakuishi.narou.ui.component.TextFieldDialog
 import com.rakuishi.narou.util.LocaleUtil
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,12 +45,38 @@ fun NovelListScreen(
     navController: NavController,
     viewModel: NovelListViewModel,
 ) {
+    val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+
     val openInsertDialog = remember { mutableStateOf(false) }
     val openDeleteDialog = remember { mutableStateOf(false) }
     val targetNovel: MutableState<Novel?> = remember { mutableStateOf(null) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
-    val haptic = LocalHapticFeedback.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { _ -> /* do nothing */ }
+    )
+    val lifecycleObserver = remember {
+        LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+            ) {
+                val permission = Manifest.permission.POST_NOTIFICATIONS
+                val state = ContextCompat.checkSelfPermission(context, permission)
+                if (state != PackageManager.PERMISSION_GRANTED) {
+                    permissionLauncher.launch(permission)
+                }
+            }
+        }
+    }
+
+    DisposableEffect(key1 = lifecycle) {
+        lifecycle.addObserver(lifecycleObserver)
+        onDispose {
+            lifecycle.removeObserver(lifecycleObserver)
+        }
+    }
 
     LaunchedEffect(key1 = snackbarHostState) {
         viewModel.snackbarMessageChannel.receiveAsFlow().collect {
