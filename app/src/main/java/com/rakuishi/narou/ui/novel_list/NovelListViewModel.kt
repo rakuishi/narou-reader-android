@@ -64,12 +64,6 @@ class NovelListViewModel(
         }
     }
 
-    fun consumeHasNewEpisodeIfNeeded(novel: Novel) {
-        viewModelScope.launch {
-            novelRepository.consumeHasNewEpisodeIfNeeded(novel)
-        }
-    }
-
     companion object {
 
         fun provideFactory(

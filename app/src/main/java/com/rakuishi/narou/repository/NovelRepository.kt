@@ -132,14 +132,10 @@ class NovelRepository(
         val novel = dao.getItemByNid(nid) ?: return
         val episodeNumber = match.groups[2]?.value?.toInt() ?: return
         novel.currentEpisodeNumber = episodeNumber
-        dao.update(novel)
-    }
-
-    suspend fun consumeHasNewEpisodeIfNeeded(novel: Novel) {
-        if (novel.hasNewEpisode) {
+        if (novel.hasNewEpisode && novel.latestEpisodeNumber == episodeNumber) {
             novel.hasNewEpisode = false
-            dao.update(novel)
         }
+        dao.update(novel)
     }
 
     private fun getDateByUpdatedAtString(updatedAtString: String): Date? {

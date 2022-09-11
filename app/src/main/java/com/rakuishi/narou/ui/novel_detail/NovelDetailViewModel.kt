@@ -35,10 +35,12 @@ class NovelDetailViewModel(
         viewModelScope.launch {
             val novel = novelRepository.getItemById(novelId) ?: return@launch
             val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
+            val url = novel.getEpisodeUrl(episodeNumber)
+            updateCurrentEpisodeNumberIfMatched(url)
             delay(400L) // for smooth transition
             content.value = Content(
                 novel,
-                novel.getEpisodeUrl(episodeNumber),
+                url,
                 cookies
             )
             uiState.value = UiState.Success

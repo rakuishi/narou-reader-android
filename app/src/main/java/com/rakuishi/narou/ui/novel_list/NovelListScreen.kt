@@ -134,7 +134,6 @@ fun NovelListScreen(
                     NovelList(
                         items = viewModel.novelList.value,
                         { novel ->
-                            viewModel.consumeHasNewEpisodeIfNeeded(novel)
                             navController.navigate(
                                 Destination.createNovelDetailRoute(
                                     novel.id,
