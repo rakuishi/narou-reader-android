@@ -59,13 +59,21 @@ fun NovelListScreen(
     )
     val lifecycleObserver = remember {
         LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-            ) {
-                val permission = Manifest.permission.POST_NOTIFICATIONS
-                val state = ContextCompat.checkSelfPermission(context, permission)
-                if (state != PackageManager.PERMISSION_GRANTED) {
-                    permissionLauncher.launch(permission)
+            when (event) {
+                Lifecycle.Event.ON_START -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        val permission = Manifest.permission.POST_NOTIFICATIONS
+                        val state = ContextCompat.checkSelfPermission(context, permission)
+                        if (state != PackageManager.PERMISSION_GRANTED) {
+                            permissionLauncher.launch(permission)
+                        }
+                    }
+                }
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.fetchNovelList()
+                }
+                else -> {
+                    /* do nothing */
                 }
             }
         }
@@ -121,7 +129,7 @@ fun NovelListScreen(
             Box {
                 SwipeRefresh(
                     state = rememberSwipeRefreshState(viewModel.isRefreshing),
-                    onRefresh = { viewModel.fetchNovelList() },
+                    onRefresh = { viewModel.fetchNovelList(forceReload = true) },
                     indicator = { state, trigger ->
                         SwipeRefreshIndicator(
                             state = state,

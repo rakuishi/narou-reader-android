@@ -29,16 +29,17 @@ class NovelListViewModel(
     val isRefreshing: Boolean
         get() = uiState.value == UiState.Loading
 
-    init {
-        fetchNovelList()
-    }
-
-    fun fetchNovelList(skipUpdateNewEpisode: Boolean = false) {
+    fun fetchNovelList(forceReload: Boolean = false) {
         viewModelScope.launch {
-            uiState.value = UiState.Loading
-            novelList.value = novelRepository.fetchList(skipUpdateNewEpisode)
-            fetchedAt.value = Date()
-            uiState.value = UiState.Success
+            if (forceReload || novelList.value.isEmpty()) {
+                uiState.value = UiState.Loading
+                novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = false)
+                fetchedAt.value = Date()
+                uiState.value = UiState.Success
+            } else {
+                novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
+                uiState.value = UiState.Success
+            }
         }
     }
 
