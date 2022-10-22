@@ -12,6 +12,7 @@ import androidx.navigation.navDeepLink
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.rakuishi.narou.App
+import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.novel_detail.NovelDetailScreen
 import com.rakuishi.narou.ui.novel_detail.NovelDetailViewModel
 import com.rakuishi.narou.ui.novel_list.NovelListScreen
@@ -23,8 +24,9 @@ object Destination {
     const val EPISODE_NUMBER = "episode_number"
     const val NOVEL_DETAIL_ROUTE = "novels/{$NOVEL_ID}/episodes/{$EPISODE_NUMBER}"
 
-    fun createNovelDetailRoute(nid: Long, episodeNumber: Int): String =
-        "novels/$nid/episodes/$episodeNumber"
+    fun createNovelDetailRoute(novel: Novel): String =
+        if (novel.hasNewEpisode && novel.currentEpisodeNumber == novel.latestEpisodeNumber - 1) "novels/${novel.id}/episodes/${novel.latestEpisodeNumber}"
+        else "novels/${novel.id}/episodes/${novel.currentEpisodeNumber}"
 }
 
 @ExperimentalAnimationApi
