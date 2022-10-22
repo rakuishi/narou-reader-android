@@ -5,6 +5,9 @@
         <item name="android:windowSplashScreenBackground" tools:ignore="NewApi">
             @color/dark_background
         </item>
+        <item name="android:windowSplashScreenAnimatedIcon" tools:ignore="NewApi">
+            @color/dark_background
+        </item>
     </style>
 
 </resources>
