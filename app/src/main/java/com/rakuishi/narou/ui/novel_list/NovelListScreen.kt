@@ -97,7 +97,13 @@ fun NovelListScreen(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = stringResource(R.string.app_name)) },
+                title = {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_narou_reader),
+                        contentDescription = stringResource(R.string.app_name),
+                        modifier = Modifier.size(24.dp)
+                    )
+                },
             )
         },
         floatingActionButton = {
