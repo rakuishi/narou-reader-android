@@ -8,8 +8,12 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,9 +29,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.rakuishi.narou.R
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.Destination
@@ -37,10 +38,11 @@ import com.rakuishi.narou.ui.component.NovelListItem
 import com.rakuishi.narou.ui.component.TextFieldDialog
 import com.rakuishi.narou.util.LocaleUtil
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun NovelListScreen(
     navController: NavController,
@@ -80,6 +82,12 @@ fun NovelListScreen(
         }
     }
 
+    val refreshScope = rememberCoroutineScope()
+    fun refresh() = refreshScope.launch {
+        viewModel.fetchNovelList(forceReload = true)
+    }
+    val pullRefreshState = rememberPullRefreshState(refreshing = viewModel.isRefreshing, onRefresh = ::refresh)
+
     DisposableEffect(key1 = lifecycle) {
         lifecycle.addObserver(lifecycleObserver)
         onDispose {
@@ -117,10 +125,11 @@ fun NovelListScreen(
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) {
+    ) { padding ->
         if (viewModel.novelList.value.isEmpty() && viewModel.uiState.value == UiState.Success) {
             Box(
                 modifier = Modifier
+                    .padding(padding)
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
@@ -133,33 +142,31 @@ fun NovelListScreen(
                 )
             }
         } else {
-            Box {
-                SwipeRefresh(
-                    state = rememberSwipeRefreshState(viewModel.isRefreshing),
-                    onRefresh = { viewModel.fetchNovelList(forceReload = true) },
-                    indicator = { state, trigger ->
-                        SwipeRefreshIndicator(
-                            state = state,
-                            refreshTriggerDistance = trigger,
-                            backgroundColor = MaterialTheme.colorScheme.background,
-                            contentColor = MaterialTheme.colorScheme.primary,
+            Box(
+                modifier = Modifier.padding(padding)
+                    .pullRefresh(pullRefreshState)
+            ) {
+                NovelList(
+                    items = viewModel.novelList.value,
+                    { novel ->
+                        navController.navigate(
+                            Destination.createNovelDetailRoute(novel)
                         )
+                    },
+                    { novel ->
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        targetNovel.value = novel
+                        openDeleteDialog.value = true
                     }
-                ) {
-                    NovelList(
-                        items = viewModel.novelList.value,
-                        { novel ->
-                            navController.navigate(
-                                Destination.createNovelDetailRoute(novel)
-                            )
-                        },
-                        { novel ->
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            targetNovel.value = novel
-                            openDeleteDialog.value = true
-                        }
-                    )
-                }
+                )
+
+                PullRefreshIndicator(
+                    refreshing = viewModel.isRefreshing,
+                    state = pullRefreshState,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    backgroundColor = MaterialTheme.colorScheme.background,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                )
 
                 viewModel.fetchedAt.value?.let {
                     Text(

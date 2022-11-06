@@ -8,6 +8,7 @@ import android.webkit.*
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -47,7 +48,7 @@ fun NovelDetailScreen(
 
     Scaffold(
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = viewModel.content.value.novel?.title ?: "",
@@ -96,9 +97,11 @@ fun NovelDetailScreen(
                 }
             )
         }
-    ) {
+    ) { padding ->
 
-        Box {
+        Box(
+            modifier = Modifier.padding(padding)
+        ) {
             if (viewModel.uiState.value == UiState.Success) {
                 val content = viewModel.content.value
                 val url = content.url ?: throw NullPointerException()
