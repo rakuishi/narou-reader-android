@@ -50,7 +50,7 @@ fun NovelListScreen(
 ) {
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
+    val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
 
     val openInsertDialog = remember { mutableStateOf(false) }
     val openDeleteDialog = remember { mutableStateOf(false) }
@@ -60,8 +60,17 @@ fun NovelListScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { _ -> /* do nothing */ }
     )
-    val lifecycleObserver = remember {
-        LifecycleEventObserver { _, event ->
+
+    val refreshScope = rememberCoroutineScope()
+    fun refresh() = refreshScope.launch {
+        viewModel.fetchNovelList(forceReload = true)
+    }
+
+    val pullRefreshState =
+        rememberPullRefreshState(refreshing = viewModel.isRefreshing, onRefresh = ::refresh)
+
+    DisposableEffect(lifecycleOwner) {
+        val lifecycleObserver = LifecycleEventObserver { _, event ->
             when (event) {
                 Lifecycle.Event.ON_START -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -80,22 +89,13 @@ fun NovelListScreen(
                 }
             }
         }
-    }
-
-    val refreshScope = rememberCoroutineScope()
-    fun refresh() = refreshScope.launch {
-        viewModel.fetchNovelList(forceReload = true)
-    }
-    val pullRefreshState = rememberPullRefreshState(refreshing = viewModel.isRefreshing, onRefresh = ::refresh)
-
-    DisposableEffect(key1 = lifecycle) {
-        lifecycle.addObserver(lifecycleObserver)
+        lifecycleOwner.addObserver(lifecycleObserver)
         onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
+            lifecycleOwner.removeObserver(lifecycleObserver)
         }
     }
 
-    LaunchedEffect(key1 = snackbarHostState) {
+    LaunchedEffect(snackbarHostState) {
         viewModel.snackbarMessageChannel.receiveAsFlow().collect {
             val message = context.getString(it)
             snackbarHostState.showSnackbar(message = message)
@@ -143,7 +143,8 @@ fun NovelListScreen(
             }
         } else {
             Box(
-                modifier = Modifier.padding(padding)
+                modifier = Modifier
+                    .padding(padding)
                     .pullRefresh(pullRefreshState)
             ) {
                 NovelList(
