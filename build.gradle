@@ -4,7 +4,6 @@ buildscript {
         lifecycle_version = '2.5.1'
         nav_version = '2.5.3'
         work_version = '2.7.1'
-        accompanist_version = '0.27.0'
     }
 } // Top-level build file where you can add configuration options common to all sub-projects/modules.
 

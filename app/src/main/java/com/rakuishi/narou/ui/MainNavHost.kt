@@ -1,16 +1,14 @@
 package com.rakuishi.narou.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
 import com.rakuishi.narou.App
 import com.rakuishi.narou.model.Novel
 import com.rakuishi.narou.ui.novel_detail.NovelDetailScreen
@@ -35,21 +33,9 @@ fun MainNavHost(
     app: App,
     navController: NavHostController,
 ) {
-    AnimatedNavHost(
+    NavHost(
         navController = navController,
         startDestination = Destination.NOVEL_LIST_ROUTE,
-        enterTransition = {
-            fadeIn()
-        },
-        popEnterTransition = {
-            fadeIn()
-        },
-        exitTransition = {
-            fadeOut()
-        },
-        popExitTransition = {
-            fadeOut()
-        },
     ) {
         composable(Destination.NOVEL_LIST_ROUTE) {
             NovelListScreen(
