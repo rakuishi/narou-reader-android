@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -51,6 +52,7 @@ fun NovelListScreen(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val openInsertDialog = remember { mutableStateOf(false) }
     val openDeleteDialog = remember { mutableStateOf(false) }
@@ -112,8 +114,10 @@ fun NovelListScreen(
                         modifier = Modifier.size(24.dp)
                     )
                 },
+                scrollBehavior = scrollBehavior
             )
         },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 openInsertDialog.value = true
