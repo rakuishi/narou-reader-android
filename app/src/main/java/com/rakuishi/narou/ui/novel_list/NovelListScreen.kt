@@ -23,7 +23,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -106,28 +105,24 @@ fun NovelListScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_narou_reader),
-                        contentDescription = stringResource(R.string.app_name),
-                        modifier = Modifier.size(24.dp)
-                    )
+                    Text(text = stringResource(R.string.app_name))
+                },
+                actions = {
+                    IconButton(onClick = {
+                        openInsertDialog.value = true
+                    }) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = stringResource(id = R.string.add_novel)
+                        )
+                    }
                 },
                 scrollBehavior = scrollBehavior
             )
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        floatingActionButton = {
-            FloatingActionButton(onClick = {
-                openInsertDialog.value = true
-            }) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = stringResource(id = R.string.add_novel)
-                )
-            }
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         if (viewModel.novelList.value.isEmpty() && viewModel.uiState.value == UiState.Success) {
