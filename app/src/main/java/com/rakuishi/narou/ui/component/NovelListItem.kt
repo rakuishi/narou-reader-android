@@ -51,7 +51,7 @@ fun NovelListItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(16.dp)
+                    .padding(8.dp)
             ) {
                 Text(
                     text = novel.title,
