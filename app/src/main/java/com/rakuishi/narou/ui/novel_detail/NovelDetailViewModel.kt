@@ -17,7 +17,7 @@ class NovelDetailViewModel(
     private val novelRepository: NovelRepository,
     private val dataStoreRepository: DataStoreRepository,
     novelId: Long,
-    episodeNumber: Int,
+    episodeId: String,
 ) : ViewModel() {
 
     class Content(
@@ -35,7 +35,7 @@ class NovelDetailViewModel(
         viewModelScope.launch {
             val novel = novelRepository.getItemById(novelId) ?: return@launch
             val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
-            val url = novel.getEpisodeUrl(episodeNumber)
+            val url = novel.getEpisodeUrl(episodeId)
             updateCurrentEpisodeNumberIfMatched(url)
             delay(400L) // for smooth transition
             content.value = Content(
@@ -65,7 +65,7 @@ class NovelDetailViewModel(
             novelRepository: NovelRepository,
             dataStoreRepository: DataStoreRepository,
             novelId: Long,
-            episodeNumber: Int,
+            episodeId: String,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -73,7 +73,7 @@ class NovelDetailViewModel(
                     novelRepository,
                     dataStoreRepository,
                     novelId,
-                    episodeNumber,
+                    episodeId,
                 ) as T
             }
         }

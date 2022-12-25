@@ -8,8 +8,8 @@
     <string name="open_in_chrome">Chrome で開く</string>
     <string name="updated_on">%s 更新</string>
     <string name="enter_url_title">ncode を入力</string>
-    <string name="enter_url_placeholder">n*** もしくは https://ncode.syosetu.com/n***/</string>
-    <string name="enter_url_failed">n*** もしくは https://ncode.syosetu.com/***/ にマッチしませんでした。</string>
+    <string name="enter_url_placeholder">https://ncode.syosetu.com/*/ もしくは https://kakuyomu.jp/works/*</string>
+    <string name="enter_url_failed">小説の URL パターンにマッチしませんでした。</string>
     <string name="delete_dialog_title">小説を削除しますか？</string>
     <string name="delete_dialog_message">この操作は取り消せません。</string>
     <string name="delete">削除</string>

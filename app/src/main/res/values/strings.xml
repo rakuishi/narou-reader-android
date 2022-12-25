@@ -8,8 +8,8 @@
     <string name="open_in_chrome">Open in Chrome</string>
     <string name="updated_on">Updated on %s</string>
     <string name="enter_url_title">Enter a ncode</string>
-    <string name="enter_url_placeholder">n*** or https://ncode.syosetu.com/n***/</string>
-    <string name="enter_url_failed">The ncode or URL doesn\'t match n*** or https://ncode.syosetu.com/***/</string>
+    <string name="enter_url_placeholder">https://ncode.syosetu.com/*/ or https://kakuyomu.jp/works/*</string>
+    <string name="enter_url_failed">The URL doesn\'t match a pattern.</string>
     <string name="delete_dialog_title">Delete this novel?</string>
     <string name="delete_dialog_message">This is permanent and can\'t be undone.</string>
     <string name="delete">Delete</string>

@@ -19,12 +19,12 @@ import com.rakuishi.narou.ui.novel_list.NovelListViewModel
 object Destination {
     const val NOVEL_LIST_ROUTE = "novels"
     const val NOVEL_ID = "novel_id"
-    const val EPISODE_NUMBER = "episode_number"
-    const val NOVEL_DETAIL_ROUTE = "novels/{$NOVEL_ID}/episodes/{$EPISODE_NUMBER}"
+    const val EPISODE_ID = "episode_id"
+    const val NOVEL_DETAIL_ROUTE = "novels/{$NOVEL_ID}/episodes/{$EPISODE_ID}"
 
     fun createNovelDetailRoute(novel: Novel): String =
-        if (novel.hasNewEpisode && novel.currentEpisodeNumber == novel.latestEpisodeNumber - 1) "novels/${novel.id}/episodes/${novel.latestEpisodeNumber}"
-        else "novels/${novel.id}/episodes/${novel.currentEpisodeNumber}"
+        if (novel.hasNewEpisode && novel.currentEpisodeNumber == novel.latestEpisodeNumber - 1) "novels/${novel.id}/episodes/${novel.latestEpisodeId}"
+        else "novels/${novel.id}/episodes/${novel.currentEpisodeId}"
 }
 
 @ExperimentalAnimationApi
@@ -49,17 +49,17 @@ fun MainNavHost(
             Destination.NOVEL_DETAIL_ROUTE,
             arguments = listOf(
                 navArgument(Destination.NOVEL_ID) { type = NavType.LongType },
-                navArgument(Destination.EPISODE_NUMBER) { type = NavType.IntType }
+                navArgument(Destination.EPISODE_ID) { type = NavType.StringType }
             ),
             deepLinks = listOf(
                 navDeepLink {
                     uriPattern =
-                        "narou://novels/{${Destination.NOVEL_ID}}/episodes/{${Destination.EPISODE_NUMBER}}"
+                        "narou://novels/{${Destination.NOVEL_ID}}/episodes/{${Destination.EPISODE_ID}}"
                 }
             ),
         ) { backStackEntry ->
-            val nid = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0L
-            val episodeNumber = backStackEntry.arguments?.getInt(Destination.EPISODE_NUMBER) ?: 0
+            val novelId = backStackEntry.arguments?.getLong(Destination.NOVEL_ID) ?: 0L
+            val episodeId = backStackEntry.arguments?.getString(Destination.EPISODE_ID) ?: ""
 
             NovelDetailScreen(
                 navController,
@@ -67,8 +67,8 @@ fun MainNavHost(
                     factory = NovelDetailViewModel.provideFactory(
                         app.novelRepository,
                         app.dataStoreRepository,
-                        nid,
-                        episodeNumber
+                        novelId,
+                        episodeId
                     )
                 )
             )

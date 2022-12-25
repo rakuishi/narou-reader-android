@@ -177,6 +177,8 @@ fun WebViewCompose(
                         onChangeProgress.invoke(newProgress.toFloat() / 100f)
                     }
                 }
+
+                settings.domStorageEnabled = true
                 settings.javaScriptEnabled = true
 
                 val cookieManager = CookieManager.getInstance()

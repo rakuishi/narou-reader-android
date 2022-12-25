@@ -29,47 +29,107 @@ class NovelRepositoryTest {
     }
 
     @Test
-    fun insertNewNovelByUrl() = runBlocking {
+    fun insertNarouNewNovel() = runBlocking {
         val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n9669bk/")
         assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
         assertEquals("理不尽な孫の手", novel?.authorName)
+        assertEquals("ncode", novel?.domain)
+        assertEquals("1", novel?.currentEpisodeId)
+        assertEquals(1, novel?.currentEpisodeNumber)
+        assertEquals("286", novel?.latestEpisodeId)
+        assertEquals(286, novel?.latestEpisodeNumber)
     }
 
     @Test
-    fun insertNewNovelByNid() = runBlocking {
-        val novel = novelRepository.insertNewNovel("n9669bk")
-        assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
-        assertEquals("理不尽な孫の手", novel?.authorName)
+    fun insertKakuyomuNewNovel() = runBlocking {
+        val novel = novelRepository.insertNewNovel("https://kakuyomu.jp/works/1177354054882739112")
+        assertEquals("ひげを剃る。そして女子高生を拾う。", novel?.title)
+        assertEquals("しめさば", novel?.authorName)
+        assertEquals("kakuyomu", novel?.domain)
+        assertEquals("1177354054882739226", novel?.currentEpisodeId.toString())
+        assertEquals(1, novel?.currentEpisodeNumber)
+        assertEquals("1177354054886577614", novel?.latestEpisodeId.toString())
+        assertEquals(39, novel?.latestEpisodeNumber)
     }
 
     @Test
-    fun fetchNewEpisodeFromNarouServer() = runBlocking {
-        // 完結済
+    fun fetchNarouNewEpisode() = runBlocking {
         val novel = Novel(
             id = 1,
-            nid = "n9669bk",
             title = "無職転生　- 異世界行ったら本気だす -",
             authorName = "理不尽な孫の手",
+            domain = "ncode",
+            nid = "n9669bk",
+            latestEpisodeId = "1",
             latestEpisodeNumber = 1,
             latestEpisodeUpdatedAt = Date(1353603600000),
+            currentEpisodeId = "1",
             currentEpisodeNumber = 1,
             hasNewEpisode = false,
         )
-        novelRepository.fetchNewEpisodeFromNarouServer(novel)
-        assertEquals(novel.latestEpisodeNumber, 286)
+        novelRepository.fetchNewEpisode(novel)
+        assertEquals(286, novel.latestEpisodeNumber)
     }
 
     @Test
-    fun updateCurrentEpisodeNumberIfMatched() = runBlocking {
+    fun fetchKakuyomuNewEpisode() = runBlocking {
+        val novel = Novel(
+            id = 1,
+            title = "ひげを剃る。そして女子高生を拾う。",
+            authorName = "しめさば",
+            domain = "kakuyomu",
+            nid = "1177354054882739112",
+            latestEpisodeId = "1",
+            latestEpisodeNumber = 1,
+            latestEpisodeUpdatedAt = Date(1488965753000),
+            currentEpisodeId = "1",
+            currentEpisodeNumber = 1,
+            hasNewEpisode = false,
+        )
+        novelRepository.fetchNewEpisode(novel)
+        assertEquals(39, novel.latestEpisodeNumber)
+    }
+
+    @Test
+    fun updateNarouCurrentEpisodeNumberIfMatched() = runBlocking {
         val novel1 = novelRepository.insertNewNovel("https://ncode.syosetu.com/n4811fg/") as Novel
         assertEquals(1, novel1.id)
         assertEquals("n4811fg", novel1.nid)
+        assertEquals("1", novel1.currentEpisodeId)
         assertEquals(1, novel1.currentEpisodeNumber)
 
-        val url = "https://ncode.syosetu.com/${novel1.nid}/2/"
+        val url = "https://ncode.syosetu.com/n4811fg/2/"
         novelRepository.updateCurrentEpisodeNumberIfMatched(url)
 
         val novel2 = novelRepository.getItemById(novel1.id) as Novel
+        assertEquals("2", novel2.currentEpisodeId)
         assertEquals(2, novel2.currentEpisodeNumber)
+    }
+
+    @Test
+    fun updateKakuyomuCurrentEpisodeNumberIfMatched() = runBlocking {
+        val novel1 =
+            novelRepository.insertNewNovel("https://kakuyomu.jp/works/1177354054882739112") as Novel
+        assertEquals(1, novel1.id)
+        assertEquals("1177354054882739112", novel1.nid)
+        assertEquals("1177354054882739226", novel1.currentEpisodeId)
+        assertEquals(1, novel1.currentEpisodeNumber)
+
+        val url = "https://kakuyomu.jp/works/1177354054882739112/episodes/1177354054882741427"
+        novelRepository.updateCurrentEpisodeNumberIfMatched(url)
+
+        val novel2 = novelRepository.getItemById(novel1.id) as Novel
+        assertEquals("1177354054882741427", novel2.currentEpisodeId)
+        assertEquals(2, novel2.currentEpisodeNumber)
+    }
+
+    @Test
+    fun fetchKakuyomuEpisodeNumber() = runBlocking {
+        // episode2 -> https://kakuyomu.jp/works/1177354054882739112/episodes/1177354054882741427
+        val episodeNumber = novelRepository.fetchKakuyomuEpisodeNumber(
+            nid = "1177354054882739112",
+            episodeId = "1177354054882741427"
+        )
+        assertEquals(2, episodeNumber)
     }
 }
