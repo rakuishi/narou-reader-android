@@ -7,6 +7,7 @@ import com.rakuishi.narou.model.Site
 import com.rakuishi.narou.repository.NovelRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -27,6 +28,11 @@ class NovelRepositoryTest {
         val context = RuntimeEnvironment.getApplication()
         database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
         novelRepository = NovelRepository(database.novelDao(), okHttpClient)
+    }
+
+    @After
+    fun tearDown() {
+        database.close()
     }
 
     @Test
