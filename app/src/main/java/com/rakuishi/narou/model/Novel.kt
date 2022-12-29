@@ -10,7 +10,7 @@ data class Novel(
     @PrimaryKey(autoGenerate = true) var id: Long,
     @ColumnInfo(name = "title") var title: String,
     @ColumnInfo(name = "author_name") var authorName: String,
-    @ColumnInfo(name = "domain") var domain: String, // ncode, kakuyomu
+    @ColumnInfo(name = "site") var site: Site, // ncode, kakuyomu
     @ColumnInfo(name = "nid") var nid: String,
     @ColumnInfo(name = "latest_episode_id") var latestEpisodeId: String,
     @ColumnInfo(name = "latest_episode_number") var latestEpisodeNumber: Int,
@@ -26,22 +26,19 @@ data class Novel(
     }
 
     val url: String
-        get() = when (domain) {
-            DOMAIN_NCODE -> "https://ncode.syosetu.com/${nid}/"
-            DOMAIN_KAKUYOMU -> "https://kakuyomu.jp/works/${nid}"
-            else -> throw IllegalStateException("domain must be set.")
+        get() = when (site) {
+            Site.NCODE -> "https://ncode.syosetu.com/${nid}/"
+            Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}"
         }
 
     val latestEpisodeUrl: String
-        get() = when (domain) {
-            DOMAIN_NCODE -> "https://ncode.syosetu.com/${nid}/${latestEpisodeId}/"
-            DOMAIN_KAKUYOMU -> "https://kakuyomu.jp/works/${nid}/episodes/${latestEpisodeId}"
-            else -> throw IllegalStateException("domain must be set.")
+        get() = when (site) {
+            Site.NCODE -> "https://ncode.syosetu.com/${nid}/${latestEpisodeId}/"
+            Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}/episodes/${latestEpisodeId}"
         }
 
-    fun getEpisodeUrl(episodeId: String): String = when (domain) {
-        DOMAIN_NCODE -> "https://ncode.syosetu.com/${nid}/${episodeId}/"
-        DOMAIN_KAKUYOMU -> "https://kakuyomu.jp/works/${nid}/episodes/${episodeId}"
-        else -> throw IllegalStateException("domain must be set.")
+    fun getEpisodeUrl(episodeId: String): String = when (site) {
+        Site.NCODE -> "https://ncode.syosetu.com/${nid}/${episodeId}/"
+        Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}/episodes/${episodeId}"
     }
 }

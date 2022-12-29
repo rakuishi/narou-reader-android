@@ -1,6 +1,7 @@
 package com.rakuishi.narou.util
 
 import com.rakuishi.narou.model.Novel
+import com.rakuishi.narou.model.Site
 import java.util.*
 
 object SampleDataProvider {
@@ -14,7 +15,7 @@ object SampleDataProvider {
         id = 0,
         title = "TRPGプレイヤーが異世界で最強ビルドを目指す～ヘンダーソン氏の福音を～",
         authorName = "Schuld",
-        domain = "ncode",
+        site = Site.NCODE,
         nid = "n4811fg",
         latestEpisodeId = "242",
         latestEpisodeNumber = 242,

@@ -3,6 +3,7 @@ package com.rakuishi.narou.repository
 import androidx.annotation.VisibleForTesting
 import com.rakuishi.narou.database.NovelDao
 import com.rakuishi.narou.model.Novel
+import com.rakuishi.narou.model.Site
 import com.rakuishi.narou.util.await
 import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
@@ -47,7 +48,7 @@ class NovelRepository(
                 id = 0,
                 title = "",
                 authorName = "",
-                domain = "ncode",
+                site = Site.NCODE,
                 nid = nid,
                 latestEpisodeId = "0",
                 latestEpisodeNumber = 0,
@@ -98,7 +99,7 @@ class NovelRepository(
                 id = 0,
                 title = "",
                 authorName = "",
-                domain = "kakuyomu",
+                site = Site.KAKUYOMU,
                 nid = nid,
                 latestEpisodeId = "",
                 latestEpisodeNumber = 0,
@@ -156,10 +157,9 @@ class NovelRepository(
             val request = Request.Builder().url(novel.url).get().build()
             val response = client.newCall(request).await()
             val body = response.body?.string() ?: ""
-            val episode = when (novel.domain) {
-                Novel.DOMAIN_NCODE -> parseNarouEpisode(body)
-                Novel.DOMAIN_KAKUYOMU -> parseKakuyomuEpisode(body)
-                else -> null
+            val episode = when (novel.site) {
+                Site.NCODE -> parseNarouEpisode(body)
+                Site.KAKUYOMU -> parseKakuyomuEpisode(body)
             } ?: return@withContext
             updateByLatestEpisodeNumberIfNeeded(
                 novel = novel,

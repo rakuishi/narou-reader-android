@@ -8,7 +8,7 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.rakuishi.narou.BuildConfig
 import com.rakuishi.narou.model.Novel
-import com.rakuishi.narou.util.DateConverter
+import com.rakuishi.narou.util.TypeConverter
 import com.rakuishi.narou.util.SampleDataProvider
 
 @Database(
@@ -19,7 +19,7 @@ import com.rakuishi.narou.util.SampleDataProvider
     exportSchema = false,
 )
 @TypeConverters(
-    DateConverter::class,
+    TypeConverter::class,
 )
 abstract class AppDatabase : RoomDatabase() {
 

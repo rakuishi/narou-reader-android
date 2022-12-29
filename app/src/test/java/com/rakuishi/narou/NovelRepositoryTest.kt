@@ -3,6 +3,7 @@ package com.rakuishi.narou
 import androidx.room.Room
 import com.rakuishi.narou.database.AppDatabase
 import com.rakuishi.narou.model.Novel
+import com.rakuishi.narou.model.Site
 import com.rakuishi.narou.repository.NovelRepository
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
@@ -33,7 +34,7 @@ class NovelRepositoryTest {
         val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n9669bk/")
         assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
         assertEquals("理不尽な孫の手", novel?.authorName)
-        assertEquals("ncode", novel?.domain)
+        assertEquals(Site.NCODE, novel?.site)
         assertEquals("1", novel?.currentEpisodeId)
         assertEquals(1, novel?.currentEpisodeNumber)
         assertEquals("286", novel?.latestEpisodeId)
@@ -45,7 +46,7 @@ class NovelRepositoryTest {
         val novel = novelRepository.insertNewNovel("https://kakuyomu.jp/works/1177354054882739112")
         assertEquals("ひげを剃る。そして女子高生を拾う。", novel?.title)
         assertEquals("しめさば", novel?.authorName)
-        assertEquals("kakuyomu", novel?.domain)
+        assertEquals(Site.KAKUYOMU, novel?.site)
         assertEquals("1177354054882739226", novel?.currentEpisodeId.toString())
         assertEquals(1, novel?.currentEpisodeNumber)
         assertEquals("1177354054886577614", novel?.latestEpisodeId.toString())
@@ -58,7 +59,7 @@ class NovelRepositoryTest {
             id = 1,
             title = "無職転生　- 異世界行ったら本気だす -",
             authorName = "理不尽な孫の手",
-            domain = "ncode",
+            site = Site.NCODE,
             nid = "n9669bk",
             latestEpisodeId = "1",
             latestEpisodeNumber = 1,
@@ -77,7 +78,7 @@ class NovelRepositoryTest {
             id = 1,
             title = "ひげを剃る。そして女子高生を拾う。",
             authorName = "しめさば",
-            domain = "kakuyomu",
+            site = Site.KAKUYOMU,
             nid = "1177354054882739112",
             latestEpisodeId = "1",
             latestEpisodeNumber = 1,
