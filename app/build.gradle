@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.rakuishi.narou"
+        applicationId "com.rakuishi.nreader"
         minSdk 30
         targetSdk 33
         versionCode 1
