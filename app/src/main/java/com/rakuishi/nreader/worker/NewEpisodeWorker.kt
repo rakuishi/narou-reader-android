@@ -51,7 +51,7 @@ class NewEpisodeWorker(
         val compareTo =
             Date(System.currentTimeMillis() - TimeUnit.MINUTES.toMillis(REPEAT_INTERVAL_MINUTES))
         val newEpisodeNovels = novels.filter {
-            it.latestEpisodeUpdatedAt.after(compareTo)
+            it.latestEpisodeUpdatedAt.after(compareTo) && it.hasNewEpisode
         }
 
         Log.d(TAG, "doWork: hasNewEpisode ${newEpisodeNovels.isNotEmpty()}")
