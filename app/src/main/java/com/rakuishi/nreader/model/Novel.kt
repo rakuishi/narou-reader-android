@@ -20,11 +20,6 @@ data class Novel(
     @ColumnInfo(name = "has_new_episode") var hasNewEpisode: Boolean,
 ) {
 
-    companion object {
-        const val DOMAIN_NCODE = "ncode"
-        const val DOMAIN_KAKUYOMU = "kakuyomu"
-    }
-
     val url: String
         get() = when (site) {
             Site.NCODE -> "https://ncode.syosetu.com/${nid}/"
