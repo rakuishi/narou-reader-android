@@ -10,7 +10,8 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.text.ParseException
 import java.text.SimpleDateFormat
-import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.util.*
 
 class NovelRepository(
@@ -217,7 +218,7 @@ class NovelRepository(
 
     private fun parseKakuyomuEpisode(body: String): Episodes? {
         val regex =
-            Regex("""<li class="widget-toc-episode">\s+<a href="/works/\d+/episodes/(\d+)" class="widget-toc-episode-episodeTitle">\s+<span class="widget-toc-episode-titleLabel js-vertical-composition-item">(.+?)</span>\s+<time class="widget-toc-episode-datePublished" datetime="(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z)">(.+?)</time>\s+</a>\s+</li>""")
+            Regex("""<li class="widget-toc-episode">\s+<a href="/works/\d+/episodes/(\d+)" class="widget-toc-episode-episodeTitle">\s+<span class="widget-toc-episode-titleLabel js-vertical-composition-item">(.+?)</span>\s+<time class="widget-toc-episode-datePublished" datetime="(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z">.+?</time>\s+</a>\s+</li>""")
         regex.findAll(body).let { results ->
             val firstEpisodeId = results.firstOrNull()?.let {
                 it.groups[1]?.value
@@ -226,19 +227,24 @@ class NovelRepository(
             results.lastOrNull()?.let {
                 val episodeId = it.groups[1]?.value ?: ""
                 val episodeNumber = results.count()
-                val updatedAtString = it.groups[3]?.value ?: ""
-                val updatedAt: Date? = try {
-                    Date(Instant.parse(updatedAtString).toEpochMilli() - 9 * 60 * 60 * 1000L)
-                } catch (e: ParseException) {
-                    null
-                }
+
+                val updatedAt = ZonedDateTime.of(
+                    it.groups[3]?.value?.toInt() ?: 0,
+                    it.groups[4]?.value?.toInt() ?: 0,
+                    it.groups[5]?.value?.toInt() ?: 0,
+                    it.groups[6]?.value?.toInt() ?: 0,
+                    it.groups[7]?.value?.toInt() ?: 0,
+                    it.groups[8]?.value?.toInt() ?: 0,
+                    0,
+                    ZoneId.of("GMT0")
+                )
 
                 return Episodes(
                     firstEpisodeId = firstEpisodeId,
                     firstEpisodeNumber = 1,
                     latestEpisodeId = episodeId,
                     latestEpisodeNumber = episodeNumber,
-                    latestEpisodeUpdatedAt = updatedAt ?: Date()
+                    latestEpisodeUpdatedAt = Date(updatedAt.toEpochSecond() * 1000)
                 )
             }
         }

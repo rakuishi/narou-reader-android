@@ -88,13 +88,14 @@ class NovelRepositoryTest {
             nid = "1177354054882739112",
             latestEpisodeId = "1",
             latestEpisodeNumber = 1,
-            latestEpisodeUpdatedAt = Date(1488965753000),
+            latestEpisodeUpdatedAt = Date(),
             currentEpisodeId = "1",
             currentEpisodeNumber = 1,
             hasNewEpisode = false,
         )
         novelRepository.fetchNewEpisode(novel)
         assertEquals(39, novel.latestEpisodeNumber)
+        assertEquals(1533224512000, novel.latestEpisodeUpdatedAt.time)
     }
 
     @Test
