@@ -89,7 +89,7 @@ fun NovelDetailScreen(
                             textResId = R.string.open_in_chrome,
                             iconResId = R.drawable.ic_share_24
                         ) {
-                            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(currentUrl))
+                            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(webView?.url))
                             context.startActivity(intent)
                             showMenu = false
                         }
