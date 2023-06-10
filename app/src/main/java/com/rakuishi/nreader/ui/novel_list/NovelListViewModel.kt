@@ -1,5 +1,6 @@
 package com.rakuishi.nreader.ui.novel_list
 
+import androidx.annotation.StringRes
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -30,9 +31,15 @@ class NovelListViewModel(
             get() = !isLoading && content?.novelList?.isEmpty() == true
     }
 
+    data class Message(
+        @StringRes
+        val stringResId: Int? = null,
+        val string: String? = null,
+    )
+
     var uiState: MutableState<UiState> = mutableStateOf(UiState())
         private set
-    var snackbarMessageChannel = Channel<Int>()
+    var snackbarMessageChannel = Channel<Message>()
         private set
 
     fun fetchNovelList(forceReload: Boolean = false) {
@@ -40,13 +47,21 @@ class NovelListViewModel(
             val updateNewEpisode = forceReload || uiState.value.content == null
             if (updateNewEpisode) uiState.value = uiState.value.copy(isLoading = true)
 
-            val novelList = novelRepository.fetchList(skipUpdateNewEpisode = !updateNewEpisode)
-            val fetchedAt = if (updateNewEpisode) Date() else uiState.value.content?.fetchedAt
-            uiState.value = uiState.value.copy(
-                isLoading = false,
-                error = null,
-                content = UiState.Content(novelList, fetchedAt)
-            )
+            try {
+                val novelList = novelRepository.fetchList(skipUpdateNewEpisode = !updateNewEpisode)
+                val fetchedAt = if (updateNewEpisode) Date() else uiState.value.content?.fetchedAt
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    error = null,
+                    content = UiState.Content(novelList, fetchedAt)
+                )
+            } catch (e: Exception) {
+                uiState.value = uiState.value.copy(
+                    isLoading = false,
+                    error = e,
+                )
+                snackbarMessageChannel.send(Message(string = e.message))
+            }
         }
     }
 
@@ -61,7 +76,7 @@ class NovelListViewModel(
                     )
                 )
             } else {
-                snackbarMessageChannel.send(R.string.enter_url_failed)
+                snackbarMessageChannel.send(Message(stringResId = R.string.enter_url_failed))
             }
         }
     }
@@ -79,7 +94,7 @@ class NovelListViewModel(
 
             val isSuccess = novelList.none { it.id == novel.id }
             if (!isSuccess) {
-                snackbarMessageChannel.send(R.string.delete_failed)
+                snackbarMessageChannel.send(Message(stringResId = R.string.delete_failed))
             }
         }
     }

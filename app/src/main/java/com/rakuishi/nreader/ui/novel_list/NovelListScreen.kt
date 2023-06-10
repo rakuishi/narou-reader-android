@@ -100,8 +100,10 @@ fun NovelListScreen(
 
     LaunchedEffect(snackbarHostState) {
         viewModel.snackbarMessageChannel.receiveAsFlow().collect {
-            val message = context.getString(it)
-            snackbarHostState.showSnackbar(message = message)
+            val message =
+                if (it.stringResId != null) context.getString(it.stringResId)
+                else it.string
+            message?.let { snackbarHostState.showSnackbar(message = it) }
         }
     }
 
@@ -137,7 +139,7 @@ fun NovelListScreen(
                 Text(
                     modifier = Modifier
                         .align(alignment = Alignment.Center)
-                        .padding(bottom = 16.dp),
+                        .padding(all = 16.dp),
                     text = stringResource(R.string.add_novel_from_fab),
                     style = MaterialTheme.typography.bodyLarge,
                 )
