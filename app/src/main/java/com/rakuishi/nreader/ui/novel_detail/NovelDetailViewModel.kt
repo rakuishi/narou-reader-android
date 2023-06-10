@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.repository.DataStoreRepository
 import com.rakuishi.nreader.repository.NovelRepository
-import com.rakuishi.nreader.ui.UiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -21,14 +20,12 @@ class NovelDetailViewModel(
 ) : ViewModel() {
 
     class Content(
-        val novel: Novel? = null,
-        val url: String? = null,
-        val cookies: Map<String, String>? = null
+        val novel: Novel,
+        val url: String,
+        val cookies: Map<String, String>,
     )
 
-    var uiState: MutableState<UiState> = mutableStateOf(UiState.Initial)
-        private set
-    var content: MutableState<Content> = mutableStateOf(Content())
+    var content: MutableState<Content?> = mutableStateOf(null)
         private set
 
     init {
@@ -43,7 +40,6 @@ class NovelDetailViewModel(
                 url,
                 cookies
             )
-            uiState.value = UiState.Success
         }
     }
 

@@ -21,7 +21,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.rakuishi.nreader.BuildConfig
 import com.rakuishi.nreader.R
-import com.rakuishi.nreader.ui.UiState
 import com.rakuishi.nreader.ui.component.IconDropdownMenuItem
 
 
@@ -51,7 +50,7 @@ fun NovelDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = viewModel.content.value.novel?.title ?: "",
+                        text = viewModel.content.value?.novel?.title ?: "",
                         maxLines = 1,
                     )
                 },
@@ -79,7 +78,7 @@ fun NovelDetailScreen(
                             textResId = R.string.move_to_latest_episode,
                             iconResId = R.drawable.ic_new_episode_24
                         ) {
-                            viewModel.content.value.novel?.latestEpisodeUrl?.let {
+                            viewModel.content.value?.novel?.latestEpisodeUrl?.let {
                                 updateCurrentUrl(it)
                                 webView?.loadUrl(it)
                             }
@@ -102,16 +101,12 @@ fun NovelDetailScreen(
         Box(
             modifier = Modifier.padding(padding)
         ) {
-            if (viewModel.uiState.value == UiState.Success) {
-                val content = viewModel.content.value
-                val url = content.url ?: throw NullPointerException()
-                val cookies = content.cookies ?: throw NullPointerException()
-
-                currentUrl = url
+            viewModel.content.value?.let { content ->
+                currentUrl = content.url
 
                 WebViewCompose(
-                    url,
-                    cookies,
+                    content.url,
+                    content.cookies,
                     { webView = it },
                     { updateCurrentUrl(it) },
                     { progress = it }
