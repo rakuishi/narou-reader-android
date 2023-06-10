@@ -32,7 +32,6 @@ import androidx.navigation.NavController
 import com.rakuishi.nreader.R
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.ui.Destination
-import com.rakuishi.nreader.ui.UiState
 import com.rakuishi.nreader.ui.component.BasicDialog
 import com.rakuishi.nreader.ui.component.NovelListItem
 import com.rakuishi.nreader.ui.component.TextFieldDialog
@@ -68,7 +67,10 @@ fun NovelListScreen(
     }
 
     val pullRefreshState =
-        rememberPullRefreshState(refreshing = viewModel.isRefreshing, onRefresh = ::refresh)
+        rememberPullRefreshState(
+            refreshing = viewModel.uiState.value.isLoading,
+            onRefresh = ::refresh
+        )
 
     DisposableEffect(lifecycleOwner) {
         val lifecycleObserver = LifecycleEventObserver { _, event ->
@@ -125,7 +127,7 @@ fun NovelListScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
-        if (viewModel.novelList.value.isEmpty() && viewModel.uiState.value == UiState.Success) {
+        if (viewModel.uiState.value.isEmpty) {
             Box(
                 modifier = Modifier
                     .padding(padding)
@@ -147,7 +149,7 @@ fun NovelListScreen(
                     .pullRefresh(pullRefreshState)
             ) {
                 NovelList(
-                    items = viewModel.novelList.value,
+                    items = viewModel.uiState.value.content?.novelList ?: emptyList(),
                     { novel ->
                         navController.navigate(
                             Destination.createNovelDetailRoute(novel)
@@ -161,14 +163,14 @@ fun NovelListScreen(
                 )
 
                 PullRefreshIndicator(
-                    refreshing = viewModel.isRefreshing,
+                    refreshing = viewModel.uiState.value.isLoading,
                     state = pullRefreshState,
                     modifier = Modifier.align(Alignment.TopCenter),
                     backgroundColor = MaterialTheme.colorScheme.background,
                     contentColor = MaterialTheme.colorScheme.primary,
                 )
 
-                viewModel.fetchedAt.value?.let {
+                viewModel.uiState.value.content?.fetchedAt?.let {
                     Text(
                         modifier = Modifier
                             .align(alignment = Alignment.BottomCenter)

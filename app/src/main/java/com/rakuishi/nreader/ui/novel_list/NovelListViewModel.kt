@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.rakuishi.nreader.R
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.repository.NovelRepository
-import com.rakuishi.nreader.ui.UiState
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -17,29 +16,37 @@ class NovelListViewModel(
     private val novelRepository: NovelRepository,
 ) : ViewModel() {
 
-    var uiState: MutableState<UiState> = mutableStateOf(UiState.Initial)
-        private set
-    var novelList: MutableState<List<Novel>> = mutableStateOf(arrayListOf())
-        private set
-    var fetchedAt: MutableState<Date?> = mutableStateOf(null)
+    data class UiState(
+        val isLoading: Boolean = true,
+        val error: Throwable? = null,
+        val content: Content? = null
+    ) {
+        data class Content(
+            val novelList: List<Novel>,
+            val fetchedAt: Date?,
+        )
+
+        val isEmpty: Boolean
+            get() = !isLoading && content?.novelList?.isEmpty() == true
+    }
+
+    var uiState: MutableState<UiState> = mutableStateOf(UiState())
         private set
     var snackbarMessageChannel = Channel<Int>()
         private set
 
-    val isRefreshing: Boolean
-        get() = uiState.value == UiState.Loading
-
     fun fetchNovelList(forceReload: Boolean = false) {
         viewModelScope.launch {
-            if (forceReload || novelList.value.isEmpty()) {
-                uiState.value = UiState.Loading
-                novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = false)
-                fetchedAt.value = Date()
-                uiState.value = UiState.Success
-            } else {
-                novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
-                uiState.value = UiState.Success
-            }
+            val updateNewEpisode = forceReload || uiState.value.content == null
+            if (updateNewEpisode) uiState.value = uiState.value.copy(isLoading = true)
+
+            val novelList = novelRepository.fetchList(skipUpdateNewEpisode = !updateNewEpisode)
+            val fetchedAt = if (updateNewEpisode) Date() else uiState.value.content?.fetchedAt
+            uiState.value = uiState.value.copy(
+                isLoading = false,
+                error = null,
+                content = UiState.Content(novelList, fetchedAt)
+            )
         }
     }
 
@@ -47,7 +54,12 @@ class NovelListViewModel(
         viewModelScope.launch {
             val novel: Novel? = novelRepository.insertNewNovel(url)
             if (novel != null) {
-                novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
+                val novelList = novelRepository.fetchList(skipUpdateNewEpisode = true)
+                uiState.value = uiState.value.copy(
+                    content = uiState.value.content?.copy(
+                        novelList = novelList,
+                    )
+                )
             } else {
                 snackbarMessageChannel.send(R.string.enter_url_failed)
             }
@@ -57,8 +69,15 @@ class NovelListViewModel(
     fun deleteNovel(novel: Novel) {
         viewModelScope.launch {
             novelRepository.delete(novel.id)
-            novelList.value = novelRepository.fetchList(skipUpdateNewEpisode = true)
-            val isSuccess = novelList.value.none { it.id == novel.id }
+
+            val novelList = novelRepository.fetchList(skipUpdateNewEpisode = true)
+            uiState.value = uiState.value.copy(
+                content = uiState.value.content?.copy(
+                    novelList = novelList,
+                )
+            )
+
+            val isSuccess = novelList.none { it.id == novel.id }
             if (!isSuccess) {
                 snackbarMessageChannel.send(R.string.delete_failed)
             }
