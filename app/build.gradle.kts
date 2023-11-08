@@ -1,64 +1,66 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    id 'kotlin-kapt'
+    id("kotlin-kapt")
 }
 
 android {
-    namespace 'com.rakuishi.nreader'
-    compileSdk 33
+    namespace = "com.rakuishi.nreader"
+    compileSdk = 33
 
     defaultConfig {
-        applicationId "com.rakuishi.nreader"
-        minSdk 30
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        applicationId = "com.rakuishi.nreader"
+        minSdk = 30
+        targetSdk = 33
+        versionCode = 1
+        versionName = "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary true
-        }
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
         debug {
-            debuggable true
-            minifyEnabled false
-            applicationIdSuffix ".debug"
+            isDebuggable = true
+            isMinifyEnabled = false
+            applicationIdSuffix = ".debug"
         }
         release {
-            debuggable false
-            minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            isDebuggable = false
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "17"
     }
 
     buildFeatures {
-        compose true
+        compose = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.3.0"
     }
 
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
+    packaging {
+        resources.excludes += listOf(
+            "/META-INF/{AL2.0,LGPL2.1}",
+        )
     }
 
+    @Suppress("UnstableApiUsage")
     testOptions {
-        unitTests.includeAndroidResources = true
+        unitTests {
+            isIncludeAndroidResources = true
+        }
     }
 }
 
@@ -66,7 +68,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
 
     // Compose
-    implementation platform(libs.androidx.compose.bom)
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.material3)
@@ -104,6 +106,8 @@ dependencies {
  * This class can only be used with the compiler argument '-Xopt-in=kotlin.RequiresOptIn'
  * To remove the warnings, we add the compiler argument -Xopt-in=kotlin.RequiresOptIn.
  */
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += listOf("-Xopt-in=kotlin.RequiresOptIn")
+    }
 }

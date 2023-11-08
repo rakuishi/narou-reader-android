@@ -1,8 +1,9 @@
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+task("clean", Delete::class) {
+    delete = setOf(rootProject.buildDir)
 }
