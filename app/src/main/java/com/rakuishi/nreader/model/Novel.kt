@@ -22,7 +22,7 @@ data class Novel(
 
     val url: String
         get() = when (site) {
-            Site.NCODE -> "https://ncode.syosetu.com/${nid}/"
+            Site.NCODE -> "https://ncode.syosetu.com/novelview/infotop/ncode/${nid}/"
             Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}"
         }
 

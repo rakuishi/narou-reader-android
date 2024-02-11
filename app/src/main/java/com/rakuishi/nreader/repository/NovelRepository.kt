@@ -5,14 +5,19 @@ import com.rakuishi.nreader.database.NovelDao
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.model.Site
 import com.rakuishi.nreader.util.await
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class NovelRepository(
     private val dao: NovelDao,
@@ -39,106 +44,56 @@ class NovelRepository(
         }
     }
 
-    private suspend fun fetchNarouNewNovel(nid: String) =
+    private suspend fun fetchNarouNewNovel(nid: String): Novel? =
         withContext(Dispatchers.IO) {
-            val url = "https://ncode.syosetu.com/${nid}/"
+            val url = "https://ncode.syosetu.com/novelview/infotop/ncode/${nid}/"
             val request = Request.Builder().url(url).get().build()
             val response = client.newCall(request).await()
             val body = response.body?.string() ?: ""
+            val info = parseNarouInfo(body) ?: return@withContext null
+
             val novel = Novel(
                 id = 0,
-                title = "",
-                authorName = "",
+                title = info.title,
+                authorName = info.authorName,
                 site = Site.NCODE,
                 nid = nid,
-                latestEpisodeId = "0",
-                latestEpisodeNumber = 0,
-                latestEpisodeUpdatedAt = Date(),
-                currentEpisodeId = "1",
-                currentEpisodeNumber = 1,
+                latestEpisodeId = info.latestEpisodeId,
+                latestEpisodeNumber = info.latestEpisodeNumber,
+                latestEpisodeUpdatedAt = info.latestEpisodeUpdatedAt,
+                currentEpisodeId = info.firstEpisodeId,
+                currentEpisodeNumber = info.firstEpisodeNumber,
                 hasNewEpisode = false,
             )
 
-            val titleRegex =
-                Regex("""<meta property="og:title" content="(.+?)" />""")
-            titleRegex.find(body)?.let {
-                novel.title = it.groups[1]?.value ?: ""
-            }
-
-            val authorNameRegex =
-                Regex("""<meta name="twitter:creator" content="(.+?)">""")
-            authorNameRegex.find(body)?.let {
-                novel.authorName = it.groups[1]?.value ?: ""
-            }
-
-            parseNarouEpisode(body)?.let {
-                novel.currentEpisodeId = it.firstEpisodeId
-                novel.currentEpisodeNumber = it.firstEpisodeNumber
-                novel.latestEpisodeId = it.latestEpisodeId
-                novel.latestEpisodeNumber = it.latestEpisodeNumber
-                novel.latestEpisodeUpdatedAt = it.latestEpisodeUpdatedAt
-            }
-
-            return@withContext if (novel.title.isNotEmpty()
-                && novel.authorName.isNotEmpty()
-                && novel.latestEpisodeId.isNotEmpty()
-            ) {
-                novel.id = dao.insert(novel)
-                novel
-            } else {
-                null
-            }
+            novel.id = dao.insert(novel)
+            return@withContext novel
         }
 
-    private suspend fun fetchKakuyomuNewNovel(nid: String) =
+    private suspend fun fetchKakuyomuNewNovel(nid: String): Novel? =
         withContext(Dispatchers.IO) {
             val url = "https://kakuyomu.jp/works/${nid}"
             val request = Request.Builder().url(url).get().build()
             val response = client.newCall(request).await()
             val body = response.body?.string() ?: ""
+            val info = parseKakuyomuInfo(body) ?: return@withContext null
+
             val novel = Novel(
                 id = 0,
-                title = "",
-                authorName = "",
+                title = info.title,
+                authorName = info.authorName,
                 site = Site.KAKUYOMU,
                 nid = nid,
-                latestEpisodeId = "",
-                latestEpisodeNumber = 0,
-                latestEpisodeUpdatedAt = Date(),
-                currentEpisodeId = "1",
-                currentEpisodeNumber = 1,
+                latestEpisodeId = info.latestEpisodeId,
+                latestEpisodeNumber = info.latestEpisodeNumber,
+                latestEpisodeUpdatedAt = info.latestEpisodeUpdatedAt,
+                currentEpisodeId = info.firstEpisodeId,
+                currentEpisodeNumber = info.firstEpisodeNumber,
                 hasNewEpisode = false,
             )
 
-            val titleRegex =
-                Regex("""<h1 id="workTitle"><a href="/works/(\d+)">(.+?)</a></h1>""")
-            titleRegex.find(body)?.let {
-                novel.title = it.groups[2]?.value ?: ""
-            }
-
-            val authorNameRegex =
-                Regex("""<span id="workAuthor-activityName"><a href="/users/(.+?)">(.+?)</a></span>""")
-            authorNameRegex.find(body)?.let {
-                novel.authorName = it.groups[2]?.value ?: ""
-            }
-
-            parseKakuyomuEpisode(body)?.let {
-                novel.currentEpisodeId = it.firstEpisodeId
-                novel.currentEpisodeNumber = it.firstEpisodeNumber
-                novel.latestEpisodeId = it.latestEpisodeId
-                novel.latestEpisodeNumber = it.latestEpisodeNumber
-                novel.latestEpisodeUpdatedAt = it.latestEpisodeUpdatedAt
-            }
-
-            return@withContext if (novel.title.isNotEmpty()
-                && novel.authorName.isNotEmpty()
-                && novel.latestEpisodeId.isNotEmpty()
-            ) {
-                novel.id = dao.insert(novel)
-                novel
-            } else {
-                null
-            }
+            novel.id = dao.insert(novel)
+            return@withContext novel
         }
 
     suspend fun fetchList(skipUpdateNewEpisode: Boolean): List<Novel> {
@@ -159,31 +114,33 @@ class NovelRepository(
             val response = client.newCall(request).await()
             val body = response.body?.string() ?: ""
             val episode = when (novel.site) {
-                Site.NCODE -> parseNarouEpisode(body)
-                Site.KAKUYOMU -> parseKakuyomuEpisode(body)
+                Site.NCODE -> parseNarouInfo(body)
+                Site.KAKUYOMU -> parseKakuyomuInfo(body)
             } ?: return@withContext
             updateByLatestEpisodeNumberIfNeeded(
                 novel = novel,
-                episodes = episode
+                novelInfo = episode
             )
         }
 
     private suspend fun updateByLatestEpisodeNumberIfNeeded(
         novel: Novel,
-        episodes: Episodes,
+        novelInfo: NovelInfo,
     ) {
-        if (episodes.latestEpisodeNumber > novel.latestEpisodeNumber
-            || episodes.latestEpisodeUpdatedAt.after(novel.latestEpisodeUpdatedAt)
+        if (novelInfo.latestEpisodeNumber > novel.latestEpisodeNumber
+            || novelInfo.latestEpisodeUpdatedAt.after(novel.latestEpisodeUpdatedAt)
         ) {
-            novel.latestEpisodeId = episodes.latestEpisodeId
-            novel.latestEpisodeNumber = episodes.latestEpisodeNumber
-            novel.latestEpisodeUpdatedAt = episodes.latestEpisodeUpdatedAt
+            novel.latestEpisodeId = novelInfo.latestEpisodeId
+            novel.latestEpisodeNumber = novelInfo.latestEpisodeNumber
+            novel.latestEpisodeUpdatedAt = novelInfo.latestEpisodeUpdatedAt
             novel.hasNewEpisode = true
             dao.update(novel)
         }
     }
 
-    class Episodes(
+    class NovelInfo(
+        val title: String,
+        val authorName: String,
         val firstEpisodeId: String,
         val firstEpisodeNumber: Int,
         val latestEpisodeId: String,
@@ -191,65 +148,113 @@ class NovelRepository(
         val latestEpisodeUpdatedAt: Date,
     )
 
-    private fun parseNarouEpisode(body: String): Episodes? {
-        val regex =
-            Regex("""<dd class="subtitle">\s+<a href="/n[a-z0-9]+/(\d+)/">.+?</a>\s+</dd>\s+<dt class="long_update">\s+(\d{4}/\d{2}/\d{2} \d{2}:\d{2})<""")
-        regex.findAll(body).lastOrNull()?.let {
-            val episodeNumber = it.groups[1]?.value?.toInt() ?: 0
-            val updatedAtString = it.groups[2]?.value ?: ""
-            val updatedAt: Date? = try {
-                val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.JAPAN)
-                sdf.parse(updatedAtString)
-            } catch (e: ParseException) {
-                null
-            }
+    private fun parseNarouInfo(body: String): NovelInfo? {
+        var title = ""
+        val titleRegex =
+            Regex("""<meta property="og:title" content="(.+?)" />""")
+        titleRegex.find(body)?.let {
+            title = it.groups[1]?.value ?: ""
+        }
 
-            return Episodes(
+        var authorName = ""
+        val authorNameRegex =
+            Regex("""<meta name="twitter:creator" content="(.+?)">""")
+        authorNameRegex.find(body)?.let {
+            authorName = it.groups[1]?.value ?: ""
+        }
+
+        var episodeNumber = 0
+        val episodeNumberRegex =
+            Regex("""</span>全(\d+)部分""")
+        episodeNumberRegex.find(body)?.let {
+            episodeNumber = it.groups[1]?.value?.toInt() ?: 0
+        }
+
+        var updatedAt = Date()
+        val updatedAtRegex =
+            Regex("""<th>最新部分掲載日</th>\s+<td>(\d{4}年 \d{2}月\d{2}日 \d{2}時\d{2}分)</td>""")
+        updatedAtRegex.find(body)?.let {
+            val updatedAtString = it.groups[1]?.value ?: ""
+            updatedAt = try {
+                val sdf = SimpleDateFormat("yyyy年 MM月dd日 HH時mm分", Locale.JAPAN)
+                sdf.parse(updatedAtString) ?: Date()
+            } catch (e: ParseException) {
+                Date()
+            }
+        }
+
+        return if (title.isNotEmpty()) {
+            NovelInfo(
+                title = title,
+                authorName = authorName,
                 firstEpisodeId = "1",
                 firstEpisodeNumber = 1,
                 latestEpisodeId = episodeNumber.toString(),
                 latestEpisodeNumber = episodeNumber,
-                latestEpisodeUpdatedAt = updatedAt ?: Date()
+                latestEpisodeUpdatedAt = updatedAt,
             )
+        } else {
+            null
         }
-
-        return null
     }
 
-    private fun parseKakuyomuEpisode(body: String): Episodes? {
+    private fun parseKakuyomuInfo(body: String): NovelInfo? {
+        var title = ""
+        val titleRegex =
+            Regex(""""__typename":"Work","id":"\d+","title":"(.+?)"""")
+        titleRegex.find(body)?.let {
+            title = it.groups[1]?.value ?: ""
+        }
+
+        var authorName = ""
+        val authorNameRegex =
+            Regex(""""activityName":"(.+?)"""")
+        authorNameRegex.find(body)?.let {
+            authorName = it.groups[1]?.value ?: ""
+        }
+
+        var firstEpisodeId: String
+        var latestEpisodeId = ""
+        var latestEpisodeNumber = 0
+        var latestEpisodeUpdatedAt = Date()
         val regex =
-            Regex("""<li class="widget-toc-episode">\s+<a href="/works/\d+/episodes/(\d+)" class="widget-toc-episode-episodeTitle">\s+<span class="widget-toc-episode-titleLabel js-vertical-composition-item">(.+?)</span>\s+<time class="widget-toc-episode-datePublished" datetime="(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z">.+?</time>\s+</a>\s+</li>""")
+            Regex(""""__typename":"Episode","id":"(\d+)","title":".+?","publishedAt":"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z"""")
         regex.findAll(body).let { results ->
-            val firstEpisodeId = results.firstOrNull()?.let {
+            firstEpisodeId = results.firstOrNull()?.let {
                 it.groups[1]?.value
             } ?: ""
 
             results.lastOrNull()?.let {
-                val episodeId = it.groups[1]?.value ?: ""
-                val episodeNumber = results.count()
+                latestEpisodeId = it.groups[1]?.value ?: ""
+                latestEpisodeNumber = results.count()
 
                 val updatedAt = ZonedDateTime.of(
+                    it.groups[2]?.value?.toInt() ?: 0,
                     it.groups[3]?.value?.toInt() ?: 0,
                     it.groups[4]?.value?.toInt() ?: 0,
                     it.groups[5]?.value?.toInt() ?: 0,
                     it.groups[6]?.value?.toInt() ?: 0,
                     it.groups[7]?.value?.toInt() ?: 0,
-                    it.groups[8]?.value?.toInt() ?: 0,
                     0,
                     ZoneId.of("GMT0")
                 )
-
-                return Episodes(
-                    firstEpisodeId = firstEpisodeId,
-                    firstEpisodeNumber = 1,
-                    latestEpisodeId = episodeId,
-                    latestEpisodeNumber = episodeNumber,
-                    latestEpisodeUpdatedAt = Date(updatedAt.toEpochSecond() * 1000)
-                )
+                latestEpisodeUpdatedAt = Date(updatedAt.toEpochSecond() * 1000)
             }
         }
 
-        return null
+        return if (title.isNotEmpty()) {
+            NovelInfo(
+                title = title,
+                authorName = authorName,
+                firstEpisodeId = firstEpisodeId,
+                firstEpisodeNumber = 1,
+                latestEpisodeId = latestEpisodeId,
+                latestEpisodeNumber = latestEpisodeNumber,
+                latestEpisodeUpdatedAt = latestEpisodeUpdatedAt,
+            )
+        } else {
+            null
+        }
     }
 
     suspend fun updateCurrentEpisodeNumberIfMatched(url: String) {
@@ -298,7 +303,7 @@ class NovelRepository(
             val body = response.body?.string() ?: ""
 
             val regex =
-                Regex("""<a href="/works/\d+/episodes/(\d+)" class="widget-toc-episode-episodeTitle">""")
+                Regex(""""__typename":"Episode","id":"(\d+)","title":".+?","publishedAt":"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z"""")
             regex.findAll(body).forEachIndexed { index, result ->
                 val id = result.groups[1]?.value ?: ""
                 if (episodeId == id) return@withContext index + 1
