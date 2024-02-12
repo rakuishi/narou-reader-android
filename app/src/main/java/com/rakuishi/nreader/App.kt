@@ -32,6 +32,6 @@ class App : Application(), Configuration.Provider {
         NewEpisodeWorker.enqueue(this)
     }
 
-    override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder().build()
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().build()
 }
