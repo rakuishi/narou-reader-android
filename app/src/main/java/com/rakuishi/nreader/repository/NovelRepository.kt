@@ -4,6 +4,7 @@ import androidx.annotation.VisibleForTesting
 import com.rakuishi.nreader.database.NovelDao
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.model.Site
+import com.rakuishi.nreader.model.Url
 import com.rakuishi.nreader.util.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -29,12 +30,12 @@ class NovelRepository(
     suspend fun getItemById(id: Long): Novel? = dao.getItemById(id)
 
     suspend fun insertNewNovel(url: String): Novel? {
-        return if (url.startsWith("https://ncode.syosetu.com/")) {
+        return if (url.startsWith(Url.NAROU)) {
             val regex = Regex("""^https://ncode.syosetu.com/(n[a-z0-9]+)/$""")
             val match = regex.find(url) ?: return null
             val nid = match.groups[1]?.value ?: return null
             return fetchNarouNewNovel(nid)
-        } else if (url.startsWith("https://kakuyomu.jp/works/")) {
+        } else if (url.startsWith(Url.KAKUYOMU)) {
             val regex = Regex("""^https://kakuyomu.jp/works/(\d+)$""")
             val match = regex.find(url) ?: return null
             val nid = match.groups[1]?.value ?: return null
@@ -46,11 +47,8 @@ class NovelRepository(
 
     private suspend fun fetchNarouNewNovel(nid: String): Novel? =
         withContext(Dispatchers.IO) {
-            val url = "https://ncode.syosetu.com/novelview/infotop/ncode/${nid}/"
-            val request = Request.Builder().url(url).get().build()
-            val response = client.newCall(request).await()
-            val body = response.body?.string() ?: ""
-            val info = parseNarouInfo(body) ?: return@withContext null
+            val response = fetch(Url.getNarouFetchUrl(nid))
+            val info = parseNarouInfo(response) ?: return@withContext null
 
             val novel = Novel(
                 id = 0,
@@ -72,11 +70,8 @@ class NovelRepository(
 
     private suspend fun fetchKakuyomuNewNovel(nid: String): Novel? =
         withContext(Dispatchers.IO) {
-            val url = "https://kakuyomu.jp/works/${nid}"
-            val request = Request.Builder().url(url).get().build()
-            val response = client.newCall(request).await()
-            val body = response.body?.string() ?: ""
-            val info = parseKakuyomuInfo(body) ?: return@withContext null
+            val response = fetch(Url.getKakuyomuFetchUrl(nid))
+            val info = parseKakuyomuInfo(response) ?: return@withContext null
 
             val novel = Novel(
                 id = 0,
@@ -110,12 +105,10 @@ class NovelRepository(
 
     suspend fun fetchNewEpisode(novel: Novel) =
         withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(novel.url).get().build()
-            val response = client.newCall(request).await()
-            val body = response.body?.string() ?: ""
+            val response = fetch(novel.fetchUrl)
             val episode = when (novel.site) {
-                Site.NCODE -> parseNarouInfo(body)
-                Site.KAKUYOMU -> parseKakuyomuInfo(body)
+                Site.NCODE -> parseNarouInfo(response)
+                Site.KAKUYOMU -> parseKakuyomuInfo(response)
             } ?: return@withContext
             updateByLatestEpisodeNumberIfNeeded(
                 novel = novel,
@@ -258,9 +251,9 @@ class NovelRepository(
     }
 
     suspend fun updateCurrentEpisodeNumberIfMatched(url: String): Novel? {
-        return if (url.startsWith("https://ncode.syosetu.com/")) {
+        return if (url.startsWith(Url.NAROU)) {
             updateNarouCurrentEpisodeNumberIfMatched(url)
-        } else if (url.startsWith("https://kakuyomu.jp/")) {
+        } else if (url.startsWith(Url.KAKUYOMU)) {
             updateKakuyomuCurrentEpisodeNumberIfMatched(url)
         } else {
             null
@@ -301,18 +294,21 @@ class NovelRepository(
     @VisibleForTesting
     suspend fun fetchKakuyomuEpisodeNumber(nid: String, episodeId: String): Int =
         withContext(Dispatchers.IO) {
-            val url = "https://kakuyomu.jp/works/${nid}"
-            val request = Request.Builder().url(url).get().build()
-            val response = client.newCall(request).await()
-            val body = response.body?.string() ?: ""
-
+            val response = fetch(Url.getKakuyomuFetchUrl(nid))
             val regex =
                 Regex(""""__typename":"Episode","id":"(\d+)","title":".+?","publishedAt":"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})Z"""")
-            regex.findAll(body).forEachIndexed { index, result ->
+            regex.findAll(response).forEachIndexed { index, result ->
                 val id = result.groups[1]?.value ?: ""
                 if (episodeId == id) return@withContext index + 1
             }
 
             return@withContext -1
+        }
+
+    private suspend fun fetch(url: String): String =
+        withContext(Dispatchers.IO) {
+            val request = Request.Builder().url(url).get().build()
+            val response = client.newCall(request).await()
+            return@withContext response.body?.string() ?: ""
         }
 }

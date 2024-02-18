@@ -3,7 +3,7 @@ package com.rakuishi.nreader.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.util.*
+import java.util.Date
 
 @Entity(tableName = "novels")
 data class Novel(
@@ -20,20 +20,20 @@ data class Novel(
     @ColumnInfo(name = "has_new_episode") var hasNewEpisode: Boolean,
 ) {
 
-    val url: String
+    val fetchUrl: String
         get() = when (site) {
-            Site.NCODE -> "https://ncode.syosetu.com/novelview/infotop/ncode/${nid}/"
-            Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}"
+            Site.NCODE -> Url.getNarouFetchUrl(nid)
+            Site.KAKUYOMU -> Url.getKakuyomuFetchUrl(nid)
         }
 
     val latestEpisodeUrl: String
         get() = when (site) {
-            Site.NCODE -> "https://ncode.syosetu.com/${nid}/${latestEpisodeId}/"
-            Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}/episodes/${latestEpisodeId}"
+            Site.NCODE -> "${Url.NAROU}/${nid}/${latestEpisodeId}/"
+            Site.KAKUYOMU -> "${Url.KAKUYOMU}/${nid}/episodes/${latestEpisodeId}"
         }
 
     fun getEpisodeUrl(episodeId: String): String = when (site) {
-        Site.NCODE -> "https://ncode.syosetu.com/${nid}/${episodeId}/"
-        Site.KAKUYOMU -> "https://kakuyomu.jp/works/${nid}/episodes/${episodeId}"
+        Site.NCODE -> "${Url.NAROU}/${nid}/${episodeId}/"
+        Site.KAKUYOMU -> "${Url.KAKUYOMU}/${nid}/episodes/${episodeId}"
     }
 }
