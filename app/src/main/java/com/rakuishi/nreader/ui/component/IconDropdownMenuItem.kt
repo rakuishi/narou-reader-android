@@ -8,7 +8,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.rakuishi.nreader.R
-import com.rakuishi.nreader.ui.theme.NarouReaderTheme
+import com.rakuishi.nreader.ui.theme.NReaderTheme
 
 @Composable
 fun IconDropdownMenuItem(
@@ -36,7 +36,7 @@ fun IconDropdownMenuItem(
 @Preview
 @Composable
 fun IconDropdownMenuItemPreview() {
-    NarouReaderTheme {
+    NReaderTheme {
         DropdownMenu(
             expanded = true,
             onDismissRequest = {},

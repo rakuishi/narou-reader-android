@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.rakuishi.nreader.R
-import com.rakuishi.nreader.ui.theme.NarouReaderTheme
+import com.rakuishi.nreader.ui.theme.NReaderTheme
 
 @ExperimentalMaterial3Api
 @Composable
@@ -66,7 +66,7 @@ fun TextFieldDialogPreview() {
     val context = LocalContext.current
     val openDialog = remember { mutableStateOf(true) }
 
-    NarouReaderTheme {
+    NReaderTheme {
         TextFieldDialog(
             title = R.string.enter_url_title,
             placeholder = R.string.enter_url_placeholder,

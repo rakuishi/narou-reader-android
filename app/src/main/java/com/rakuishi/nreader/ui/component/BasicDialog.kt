@@ -13,7 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import com.rakuishi.nreader.ui.theme.NarouReaderTheme
+import com.rakuishi.nreader.ui.theme.NReaderTheme
 
 @ExperimentalMaterial3Api
 @Composable
@@ -61,7 +61,7 @@ fun BasicDialogPreview() {
     val context = LocalContext.current
     val openDialog = remember { mutableStateOf(true) }
 
-    NarouReaderTheme {
+    NReaderTheme {
         BasicDialog(
             title = android.R.string.dialog_alert_title,
             message = android.R.string.dialog_alert_title,

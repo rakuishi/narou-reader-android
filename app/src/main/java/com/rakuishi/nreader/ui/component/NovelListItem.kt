@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.rakuishi.nreader.R
 import com.rakuishi.nreader.model.Novel
-import com.rakuishi.nreader.ui.theme.NarouReaderTheme
+import com.rakuishi.nreader.ui.theme.NReaderTheme
 import com.rakuishi.nreader.util.LocaleUtil
 import com.rakuishi.nreader.util.SampleDataProvider
 import java.text.SimpleDateFormat
@@ -91,7 +91,7 @@ fun NovelListItem(
 @Preview
 @Composable
 fun NovelListItemPreview() {
-    NarouReaderTheme {
+    NReaderTheme {
         NovelListItem(
             novel = SampleDataProvider.novel(),
             onClickNovel = {},
