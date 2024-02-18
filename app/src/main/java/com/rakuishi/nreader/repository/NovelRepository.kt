@@ -257,34 +257,37 @@ class NovelRepository(
         }
     }
 
-    suspend fun updateCurrentEpisodeNumberIfMatched(url: String) {
-        if (url.startsWith("https://ncode.syosetu.com/")) {
+    suspend fun updateCurrentEpisodeNumberIfMatched(url: String): Novel? {
+        return if (url.startsWith("https://ncode.syosetu.com/")) {
             updateNarouCurrentEpisodeNumberIfMatched(url)
         } else if (url.startsWith("https://kakuyomu.jp/")) {
             updateKakuyomuCurrentEpisodeNumberIfMatched(url)
+        } else {
+            null
         }
     }
 
-    private suspend fun updateNarouCurrentEpisodeNumberIfMatched(url: String) {
+    private suspend fun updateNarouCurrentEpisodeNumberIfMatched(url: String): Novel? {
         val regex = Regex("""^https://ncode.syosetu.com/(n[a-z0-9]+)/(\d+)/$""")
-        val match = regex.find(url) ?: return
-        val nid = match.groups[1]?.value ?: return
-        val novel = dao.getItemByNid(nid) ?: return
-        val episodeNumber = match.groups[2]?.value?.toInt() ?: return
+        val match = regex.find(url) ?: return null
+        val nid = match.groups[1]?.value ?: return null
+        val novel = dao.getItemByNid(nid) ?: return null
+        val episodeNumber = match.groups[2]?.value?.toInt() ?: return null
         novel.currentEpisodeId = episodeNumber.toString()
         novel.currentEpisodeNumber = episodeNumber
         if (novel.hasNewEpisode && novel.latestEpisodeNumber == episodeNumber) {
             novel.hasNewEpisode = false
         }
         dao.update(novel)
+        return novel
     }
 
-    private suspend fun updateKakuyomuCurrentEpisodeNumberIfMatched(url: String) {
+    private suspend fun updateKakuyomuCurrentEpisodeNumberIfMatched(url: String): Novel? {
         val regex = Regex("""^https://kakuyomu.jp/works/(\d+)/episodes/(\d+)$""")
-        val match = regex.find(url) ?: return
-        val nid = match.groups[1]?.value ?: return
-        val novel = dao.getItemByNid(nid) ?: return
-        val episodeId = match.groups[2]?.value ?: return
+        val match = regex.find(url) ?: return null
+        val nid = match.groups[1]?.value ?: return null
+        val novel = dao.getItemByNid(nid) ?: return null
+        val episodeId = match.groups[2]?.value ?: return null
         val episodeNumber = fetchKakuyomuEpisodeNumber(nid, episodeId)
         novel.currentEpisodeId = episodeId
         novel.currentEpisodeNumber = episodeNumber
@@ -292,6 +295,7 @@ class NovelRepository(
             novel.hasNewEpisode = false
         }
         dao.update(novel)
+        return novel
     }
 
     @VisibleForTesting

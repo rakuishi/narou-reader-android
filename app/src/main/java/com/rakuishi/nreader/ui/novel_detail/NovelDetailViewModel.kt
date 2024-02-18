@@ -2,17 +2,22 @@ package com.rakuishi.nreader.ui.novel_detail
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.CreationExtras
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.repository.DataStoreRepository
 import com.rakuishi.nreader.repository.NovelRepository
+import com.rakuishi.nreader.ui.Destination
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class NovelDetailViewModel(
+    private val savedStateHandle: SavedStateHandle,
     private val novelRepository: NovelRepository,
     private val dataStoreRepository: DataStoreRepository,
     novelId: Long,
@@ -25,14 +30,18 @@ class NovelDetailViewModel(
         val cookies: Map<String, String>,
     )
 
-    var content: MutableState<Content?> = mutableStateOf(null)
-        private set
+    val content: MutableState<Content?> = mutableStateOf(null)
 
     init {
         viewModelScope.launch {
             val novel = novelRepository.getItemById(novelId) ?: return@launch
             val cookies: Map<String, String> = dataStoreRepository.readCookies().first()
-            val url = novel.getEpisodeUrl(episodeId)
+            val currentEpisodeId = if (savedStateHandle.contains(Destination.EPISODE_ID)) {
+                savedStateHandle[Destination.EPISODE_ID] ?: ""
+            } else {
+                episodeId
+            }
+            val url = novel.getEpisodeUrl(currentEpisodeId)
             updateCurrentEpisodeNumberIfMatched(url)
             delay(400L) // for smooth transition
             content.value = Content(
@@ -45,7 +54,10 @@ class NovelDetailViewModel(
 
     fun updateCurrentEpisodeNumberIfMatched(url: String) {
         viewModelScope.launch {
-            novelRepository.updateCurrentEpisodeNumberIfMatched(url)
+            val novel = novelRepository.updateCurrentEpisodeNumberIfMatched(url)
+            if (novel != null) {
+                savedStateHandle[Destination.EPISODE_ID] = novel.currentEpisodeId
+            }
         }
     }
 
@@ -64,8 +76,9 @@ class NovelDetailViewModel(
             episodeId: String,
         ): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
                 return NovelDetailViewModel(
+                    extras.createSavedStateHandle(),
                     novelRepository,
                     dataStoreRepository,
                     novelId,
