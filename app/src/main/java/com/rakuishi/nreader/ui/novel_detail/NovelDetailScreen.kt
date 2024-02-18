@@ -75,6 +75,13 @@ fun NovelDetailScreen(
                         onDismissRequest = { showMenu = false },
                     ) {
                         IconDropdownMenuItem(
+                            textResId = R.string.refresh,
+                            iconResId = R.drawable.ic_refresh_24
+                        ) {
+                            webView?.reload()
+                            showMenu = false
+                        }
+                        IconDropdownMenuItem(
                             textResId = R.string.move_to_latest_episode,
                             iconResId = R.drawable.ic_new_episode_24
                         ) {

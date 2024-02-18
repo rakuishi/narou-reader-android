@@ -4,6 +4,7 @@
     <string name="novel_latest_episode_meta">%d/%d 話・%s更新</string>
     <string name="has_new_episode">最新話</string>
     <string name="add_novel">小説を追加</string>
+    <string name="refresh">更新</string>
     <string name="move_to_latest_episode">最新話に移動</string>
     <string name="open_in_chrome">Chrome で開く</string>
     <string name="updated_on">%s 更新</string>
