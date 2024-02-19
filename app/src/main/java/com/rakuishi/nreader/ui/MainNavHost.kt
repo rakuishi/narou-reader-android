@@ -1,6 +1,8 @@
 package com.rakuishi.nreader.ui
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -37,7 +39,22 @@ fun MainNavHost(
         navController = navController,
         startDestination = Destination.NOVEL_LIST_ROUTE,
     ) {
-        composable(Destination.NOVEL_LIST_ROUTE) {
+        composable(
+            route = Destination.NOVEL_LIST_ROUTE,
+            // https://android-developers-jp.googleblog.com/2021/08/animations-in-navigation-compose.html
+            exitTransition = {
+                slideOutOfContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Left,
+                    animationSpec = tween(400)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    AnimatedContentTransitionScope.SlideDirection.Right,
+                    animationSpec = tween(400)
+                )
+            }
+        ) {
             NovelListScreen(
                 navController,
                 viewModel(
@@ -46,7 +63,7 @@ fun MainNavHost(
             )
         }
         composable(
-            Destination.NOVEL_DETAIL_ROUTE,
+            route = Destination.NOVEL_DETAIL_ROUTE,
             arguments = listOf(
                 navArgument(Destination.NOVEL_ID) { type = NavType.LongType },
                 navArgument(Destination.EPISODE_ID) { type = NavType.StringType }
