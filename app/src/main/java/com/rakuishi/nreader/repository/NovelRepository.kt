@@ -1,6 +1,7 @@
 package com.rakuishi.nreader.repository
 
 import androidx.annotation.VisibleForTesting
+import com.rakuishi.nreader.BuildConfig
 import com.rakuishi.nreader.database.NovelDao
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.model.Site
@@ -158,16 +159,16 @@ class NovelRepository(
 
         var episodeNumber = 0
         val episodeNumberRegex =
-            Regex("""</span>全(\d+)部分""")
+            Regex("""全(\d+)エピソード""")
         episodeNumberRegex.find(body)?.let {
             episodeNumber = it.groups[1]?.value?.toInt() ?: 0
         }
 
         var updatedAt = Date()
         val updatedAtRegex =
-            Regex("""<th>最新部分掲載日</th>\s+<td>(\d{4}年 \d{2}月\d{2}日 \d{2}時\d{2}分)</td>""")
+            Regex("""<th>(最終掲載日|最新掲載日)</th>\s+<td>(\d{4}年 \d{2}月\d{2}日 \d{2}時\d{2}分)</td>""")
         updatedAtRegex.find(body)?.let {
-            val updatedAtString = it.groups[1]?.value ?: ""
+            val updatedAtString = it.groups[2]?.value ?: ""
             updatedAt = try {
                 val sdf = SimpleDateFormat("yyyy年 MM月dd日 HH時mm分", Locale.JAPAN)
                 sdf.parse(updatedAtString) ?: Date()
@@ -307,7 +308,11 @@ class NovelRepository(
 
     private suspend fun fetch(url: String): String =
         withContext(Dispatchers.IO) {
-            val request = Request.Builder().url(url).get().build()
+            val request = Request.Builder()
+                .url(url)
+                .header("User-Agent", "nreader/${BuildConfig.VERSION_NAME}")
+                .get()
+                .build()
             val response = client.newCall(request).await()
             return@withContext response.body?.string() ?: ""
         }

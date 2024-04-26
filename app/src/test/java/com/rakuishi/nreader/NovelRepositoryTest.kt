@@ -14,7 +14,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.RuntimeEnvironment
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 @RunWith(RobolectricTestRunner::class)
 class NovelRepositoryTest {
@@ -36,8 +37,11 @@ class NovelRepositoryTest {
     }
 
     @Test
-    fun insertNarouNewNovel() = runBlocking {
+    fun insertNarouNewCompletedNovel() = runBlocking {
         val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n9669bk/")
+        val calendar = Calendar.getInstance()
+        calendar.time = novel?.latestEpisodeUpdatedAt ?: Date()
+
         assertEquals("無職転生　- 異世界行ったら本気だす -", novel?.title)
         assertEquals("理不尽な孫の手", novel?.authorName)
         assertEquals(Site.NCODE, novel?.site)
@@ -45,6 +49,25 @@ class NovelRepositoryTest {
         assertEquals(1, novel?.currentEpisodeNumber)
         assertEquals("286", novel?.latestEpisodeId)
         assertEquals(286, novel?.latestEpisodeNumber)
+        assertEquals(2015, calendar[Calendar.YEAR]) // 2015/04
+        assertEquals(3, calendar[Calendar.MONTH])
+    }
+
+    @Test
+    fun insertNarouNewOngoingNovel() = runBlocking {
+        val novel = novelRepository.insertNewNovel("https://ncode.syosetu.com/n3556o/")
+        val calendar = Calendar.getInstance()
+        calendar.time = novel?.latestEpisodeUpdatedAt ?: Date()
+
+        assertEquals("Knight's &amp; Magic", novel?.title)
+        assertEquals("天酒之瓢", novel?.authorName)
+        assertEquals(Site.NCODE, novel?.site)
+        assertEquals("1", novel?.currentEpisodeId)
+        assertEquals(1, novel?.currentEpisodeNumber)
+        assertEquals("213", novel?.latestEpisodeId)
+        assertEquals(213, novel?.latestEpisodeNumber)
+        assertEquals(2023, calendar[Calendar.YEAR]) // 2023/09
+        assertEquals(8, calendar[Calendar.MONTH])
     }
 
     @Test
