@@ -59,7 +59,7 @@ class NovelRepositoryTest {
         val calendar = Calendar.getInstance()
         calendar.time = novel?.latestEpisodeUpdatedAt ?: Date()
 
-        assertEquals("Knight's &amp; Magic", novel?.title)
+        assertEquals("Knight's & Magic", novel?.title)
         assertEquals("天酒之瓢", novel?.authorName)
         assertEquals(Site.NCODE, novel?.site)
         assertEquals("1", novel?.currentEpisodeId)

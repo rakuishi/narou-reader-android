@@ -148,6 +148,7 @@ class NovelRepository(
             Regex("""<meta property="og:title" content="(.+?)" />""")
         titleRegex.find(body)?.let {
             title = it.groups[1]?.value ?: ""
+            title = title.replace("&amp;", "&")
         }
 
         var authorName = ""
