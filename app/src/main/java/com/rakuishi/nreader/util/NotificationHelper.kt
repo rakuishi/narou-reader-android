@@ -35,7 +35,7 @@ object NotificationHelper {
     fun notifyNewEpisode(context: Context, novel: Novel) {
         val deepLinkIntent = Intent(
             Intent.ACTION_VIEW,
-            "narou://novels/${novel.id}/episodes/${novel.latestEpisodeNumber}".toUri(),
+            "narou://novels/${novel.id}/episodes/${novel.latestEpisodeId}".toUri(),
             context,
             MainActivity::class.java
         )
