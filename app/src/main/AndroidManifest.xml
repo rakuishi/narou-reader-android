@@ -23,6 +23,7 @@
             android:name="com.rakuishi.nreader.ui.MainActivity"
             android:enableOnBackInvokedCallback="true"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.NReader">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
