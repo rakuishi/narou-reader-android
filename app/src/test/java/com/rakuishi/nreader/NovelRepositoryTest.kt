@@ -5,8 +5,8 @@ import com.rakuishi.nreader.database.AppDatabase
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.model.Site
 import com.rakuishi.nreader.repository.NovelRepository
+import io.ktor.client.HttpClient
 import kotlinx.coroutines.runBlocking
-import okhttp3.OkHttpClient
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -22,13 +22,13 @@ class NovelRepositoryTest {
 
     private lateinit var database: AppDatabase
     private lateinit var novelRepository: NovelRepository
-    private val okHttpClient = OkHttpClient()
+    private val httpClient = HttpClient()
 
     @Before
     fun setupRepository() {
         val context = RuntimeEnvironment.getApplication()
         database = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java).build()
-        novelRepository = NovelRepository(database.novelDao(), okHttpClient)
+        novelRepository = NovelRepository(database.novelDao(), httpClient)
     }
 
     @After

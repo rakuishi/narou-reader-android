@@ -90,7 +90,7 @@ dependencies {
     implementation(libs.androidx.datastore)
 
     // Network
-    implementation(libs.okhttp)
+    implementation(libs.ktor.client.android)
 
     // Worker
     implementation(libs.androidx.work.runtime)

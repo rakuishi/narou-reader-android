@@ -6,14 +6,16 @@ import com.rakuishi.nreader.database.NovelDao
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.model.Site
 import com.rakuishi.nreader.model.Url
-import com.rakuishi.nreader.util.await
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.url
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.ZoneId
@@ -23,7 +25,7 @@ import java.util.Locale
 
 class NovelRepository(
     private val dao: NovelDao,
-    private val client: OkHttpClient,
+    private val httpClient: HttpClient,
 ) {
 
     suspend fun delete(id: Long) = dao.delete(id)
@@ -309,12 +311,10 @@ class NovelRepository(
 
     private suspend fun fetch(url: String): String =
         withContext(Dispatchers.IO) {
-            val request = Request.Builder()
-                .url(url)
-                .header("User-Agent", "nreader/${BuildConfig.VERSION_NAME}")
-                .get()
-                .build()
-            val response = client.newCall(request).await()
-            return@withContext response.body?.string() ?: ""
+            val response = httpClient.get {
+                url(url)
+                header("User-Agent", "nreader/${BuildConfig.VERSION_NAME}")
+            }
+            return@withContext response.bodyAsText()
         }
 }

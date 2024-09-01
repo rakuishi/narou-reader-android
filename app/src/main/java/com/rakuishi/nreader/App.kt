@@ -10,13 +10,14 @@ import com.rakuishi.nreader.repository.DataStoreRepository
 import com.rakuishi.nreader.repository.NovelRepository
 import com.rakuishi.nreader.util.NotificationHelper
 import com.rakuishi.nreader.worker.NewEpisodeWorker
-import okhttp3.OkHttpClient
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
 
 class App : Application(), Configuration.Provider {
 
     private lateinit var appDatabase: AppDatabase
     private val dataStore: DataStore<Preferences> by preferencesDataStore(name = "preferences")
-    private val okHttpClient = OkHttpClient()
+    private val httpClient = HttpClient(Android)
 
     // TODO: Use dependency injection in the future
     lateinit var novelRepository: NovelRepository
@@ -25,7 +26,7 @@ class App : Application(), Configuration.Provider {
     override fun onCreate() {
         super.onCreate()
         appDatabase = AppDatabase.getDatabase(this)
-        novelRepository = NovelRepository(appDatabase.novelDao(), okHttpClient)
+        novelRepository = NovelRepository(appDatabase.novelDao(), httpClient)
         dataStoreRepository = DataStoreRepository(dataStore)
 
         NotificationHelper.setupNotificationChannel(this)
