@@ -24,13 +24,13 @@ class NovelDetailViewModel(
     episodeId: String,
 ) : ViewModel() {
 
-    class Content(
+    class UiState(
         val novel: Novel,
         val url: String,
         val cookies: Map<String, String>,
     )
 
-    val content: MutableState<Content?> = mutableStateOf(null)
+    val uiState: MutableState<UiState?> = mutableStateOf(null)
 
     init {
         viewModelScope.launch {
@@ -44,7 +44,7 @@ class NovelDetailViewModel(
             val url = novel.getEpisodeUrl(currentEpisodeId)
             updateCurrentEpisodeNumberIfMatched(url)
             delay(400L) // for smooth transition
-            content.value = Content(
+            uiState.value = UiState(
                 novel,
                 url,
                 cookies

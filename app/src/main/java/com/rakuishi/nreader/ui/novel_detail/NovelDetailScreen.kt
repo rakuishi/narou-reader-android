@@ -68,7 +68,7 @@ fun NovelDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = viewModel.content.value?.novel?.title ?: "",
+                        text = viewModel.uiState.value?.novel?.title ?: "",
                         maxLines = 1,
                     )
                 },
@@ -106,7 +106,7 @@ fun NovelDetailScreen(
                             textResId = R.string.move_to_latest_episode,
                             iconResId = R.drawable.ic_new_episode_24
                         ) {
-                            viewModel.content.value?.novel?.latestEpisodeUrl?.let {
+                            viewModel.uiState.value?.novel?.latestEpisodeUrl?.let {
                                 updateCurrentUrl(it)
                                 webView?.loadUrl(it)
                             }
@@ -129,7 +129,7 @@ fun NovelDetailScreen(
         Box(
             modifier = Modifier.padding(padding)
         ) {
-            viewModel.content.value?.let { content ->
+            viewModel.uiState.value?.let { content ->
                 currentUrl = content.url
 
                 WebViewCompose(
