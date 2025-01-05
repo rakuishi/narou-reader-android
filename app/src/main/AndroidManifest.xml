@@ -24,7 +24,8 @@
             android:enableOnBackInvokedCallback="true"
             android:exported="true"
             android:launchMode="singleTop"
-            android:theme="@style/Theme.NReader">
+            android:theme="@style/Theme.NReader"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
