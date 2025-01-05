@@ -313,7 +313,10 @@ class NovelRepository(
         withContext(Dispatchers.IO) {
             val response = httpClient.get {
                 url(url)
-                header("User-Agent", "nreader/${BuildConfig.VERSION_NAME}")
+                header(
+                    "User-Agent",
+                    "nreader/${BuildConfig.VERSION_NAME}"
+                )
             }
             return@withContext response.bodyAsText()
         }
