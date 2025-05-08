@@ -147,7 +147,7 @@ class NovelRepository(
     private fun parseNarouInfo(body: String): NovelInfo? {
         var title = ""
         val titleRegex =
-            Regex("""<meta property="og:title" content="(.+?)" />""")
+            Regex("""<meta property="og:title" content="(.+?)">""")
         titleRegex.find(body)?.let {
             title = it.groups[1]?.value ?: ""
             title = title.replace("&amp;", "&")
@@ -169,7 +169,7 @@ class NovelRepository(
 
         var updatedAt = Date()
         val updatedAtRegex =
-            Regex("""<th>(最終掲載日|最新掲載日)</th>\s+<td>(\d{4}年 \d{2}月\d{2}日 \d{2}時\d{2}分)</td>""")
+            Regex("""<dt class="p-infotop-data__title">(最終掲載日|最新掲載日)</dt>\s+<dd class="p-infotop-data__value">(\d{4}年 \d{2}月\d{2}日 \d{2}時\d{2}分)</dd>""")
         updatedAtRegex.find(body)?.let {
             val updatedAtString = it.groups[2]?.value ?: ""
             updatedAt = try {
