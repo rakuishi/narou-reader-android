@@ -12,13 +12,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +25,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -38,7 +38,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -60,7 +59,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NovelListScreen(
     navController: NavController,
@@ -85,11 +84,7 @@ fun NovelListScreen(
         viewModel.fetchNovelList(forceReload = true)
     }
 
-    val pullRefreshState =
-        rememberPullRefreshState(
-            refreshing = viewModel.uiState.value.isLoading,
-            onRefresh = ::refresh
-        )
+    val pullToRefreshState = rememberPullToRefreshState()
 
     DisposableEffect(lifecycleOwner) {
         val lifecycleObserver = LifecycleEventObserver { _, event ->
@@ -147,7 +142,11 @@ fun NovelListScreen(
                 scrollBehavior = scrollBehavior
             )
         },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.pullToRefresh(
+            state = pullToRefreshState,
+            isRefreshing = viewModel.uiState.value.isLoading,
+            onRefresh = ::refresh,
+        ),
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { padding ->
         if (viewModel.uiState.value.isEmpty) {
@@ -169,7 +168,6 @@ fun NovelListScreen(
             Box(
                 modifier = Modifier
                     .padding(padding)
-                    .pullRefresh(pullRefreshState)
             ) {
                 NovelList(
                     items = viewModel.uiState.value.content?.novelList ?: emptyList(),
@@ -185,12 +183,10 @@ fun NovelListScreen(
                     }
                 )
 
-                PullRefreshIndicator(
-                    refreshing = viewModel.uiState.value.isLoading,
-                    state = pullRefreshState,
+                PullToRefreshDefaults.LoadingIndicator(
+                    isRefreshing = viewModel.uiState.value.isLoading,
+                    state = pullToRefreshState,
                     modifier = Modifier.align(Alignment.TopCenter),
-                    backgroundColor = MaterialTheme.colorScheme.background,
-                    contentColor = MaterialTheme.colorScheme.primary,
                 )
 
                 viewModel.uiState.value.content?.fetchedAt?.let {
