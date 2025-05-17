@@ -34,7 +34,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
-@ExperimentalMaterial3ExpressiveApi
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NReaderTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
