@@ -24,7 +24,7 @@ class NovelDetailViewModel(
     episodeId: String,
 ) : ViewModel() {
 
-    class UiState(
+    data class UiState(
         val novel: Novel,
         val url: String,
         val cookies: Map<String, String>,
@@ -56,6 +56,7 @@ class NovelDetailViewModel(
         viewModelScope.launch {
             val novel = novelRepository.updateCurrentEpisodeNumberIfMatched(url)
             if (novel != null) {
+                uiState.value = uiState.value?.copy(novel = novel)
                 savedStateHandle[Destination.EPISODE_ID] = novel.currentEpisodeId
             }
         }
