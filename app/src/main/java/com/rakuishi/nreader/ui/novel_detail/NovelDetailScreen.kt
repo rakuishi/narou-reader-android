@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -34,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
@@ -42,7 +44,7 @@ import com.rakuishi.nreader.R
 import com.rakuishi.nreader.ui.component.IconDropdownMenuItem
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun NovelDetailScreen(
     navController: NavController,
@@ -70,6 +72,17 @@ fun NovelDetailScreen(
                     Text(
                         text = viewModel.uiState.value?.novel?.title ?: "",
                         maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                },
+                subtitle = {
+                    val novel = viewModel.uiState.value?.novel ?: return@TopAppBar
+                    Text(
+                        text = stringResource(
+                            R.string.novel_episode,
+                            novel.currentEpisodeNumber,
+                            novel.latestEpisodeNumber,
+                        )
                     )
                 },
                 navigationIcon = {
