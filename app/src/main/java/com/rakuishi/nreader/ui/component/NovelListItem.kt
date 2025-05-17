@@ -1,9 +1,13 @@
 package com.rakuishi.nreader.ui.component
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,21 +28,32 @@ import com.rakuishi.nreader.ui.theme.NReaderTheme
 import com.rakuishi.nreader.util.LocaleUtil
 import com.rakuishi.nreader.util.SampleDataProvider
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Locale
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NovelListItem(
     novel: Novel,
+    isFirst: Boolean = false,
+    isLast: Boolean = false,
     onClickNovel: (novel: Novel) -> Unit,
     onLongClickNovel: (novel: Novel) -> Unit,
 ) {
+
+    val topCorner = if (isFirst) 16.dp else 0.dp
+    val bottomCorner = if (isLast) 16.dp else 0.dp
+    val roundedCornerShape = RoundedCornerShape(
+        topStart = topCorner,
+        topEnd = topCorner,
+        bottomStart = bottomCorner,
+        bottomEnd = bottomCorner
+    )
+
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp, vertical = 4.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp, vertical = 1.dp)
+            .clip(roundedCornerShape)
+            .background(color = MaterialTheme.colorScheme.surfaceContainerHighest)
             .combinedClickable(
                 onClick = { onClickNovel.invoke(novel) },
                 onLongClick = { onLongClickNovel.invoke(novel) },
@@ -51,7 +66,7 @@ fun NovelListItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(8.dp)
+                    .padding(16.dp)
             ) {
                 Text(
                     text = novel.title,

@@ -234,9 +234,11 @@ fun NovelList(
     onLongClickNovel: (novel: Novel) -> Unit,
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        itemsIndexed(items) { _, novel ->
+        itemsIndexed(items) { index, novel ->
             NovelListItem(
                 novel,
+                isFirst = index == 0,
+                isLast = index == items.lastIndex,
                 onClickNovel,
                 onLongClickNovel,
             )
