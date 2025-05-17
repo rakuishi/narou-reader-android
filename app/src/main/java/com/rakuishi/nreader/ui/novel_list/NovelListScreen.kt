@@ -129,6 +129,19 @@ fun NovelListScreen(
                 title = {
                     Text(text = stringResource(R.string.app_name))
                 },
+                subtitle = {
+                    viewModel.uiState.value.content?.fetchedAt?.let {
+                        Text(
+                            text = stringResource(
+                                R.string.updated_on,
+                                SimpleDateFormat(
+                                    if (LocaleUtil.isJa()) "M月d日 HH:mm" else "HH:mm, d LLLL",
+                                    if (LocaleUtil.isJa()) Locale.JAPAN else Locale.US
+                                ).format(it)
+                            ),
+                        )
+                    }
+                },
                 actions = {
                     IconButton(onClick = {
                         openInsertDialog.value = true
@@ -188,23 +201,6 @@ fun NovelListScreen(
                     state = pullToRefreshState,
                     modifier = Modifier.align(Alignment.TopCenter),
                 )
-
-                viewModel.uiState.value.content?.fetchedAt?.let {
-                    Text(
-                        modifier = Modifier
-                            .align(alignment = Alignment.BottomCenter)
-                            .padding(bottom = 16.dp),
-                        text = stringResource(
-                            R.string.updated_on,
-                            SimpleDateFormat(
-                                if (LocaleUtil.isJa()) "M月d日 HH:mm" else "HH:mm, d LLLL",
-                                if (LocaleUtil.isJa()) Locale.JAPAN else Locale.US
-                            ).format(it)
-                        ),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary,
-                    )
-                }
             }
         }
     }

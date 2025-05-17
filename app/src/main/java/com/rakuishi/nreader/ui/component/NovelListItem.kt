@@ -62,7 +62,7 @@ fun NovelListItem(
                 )
                 Text(
                     text = stringResource(
-                        R.string.novel_latest_episode_meta,
+                        R.string.novel_episode_and_updated_at,
                         novel.currentEpisodeNumber,
                         novel.latestEpisodeNumber,
                         SimpleDateFormat(
