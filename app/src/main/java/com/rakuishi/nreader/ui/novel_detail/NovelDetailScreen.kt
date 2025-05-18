@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import com.rakuishi.nreader.BuildConfig
 import com.rakuishi.nreader.R
 import com.rakuishi.nreader.ui.component.IconDropdownMenuItem
+import androidx.core.net.toUri
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -129,7 +130,7 @@ fun NovelDetailScreen(
                             textResId = R.string.open_in_chrome,
                             iconResId = R.drawable.ic_share_24
                         ) {
-                            val intent = Intent(Intent.ACTION_VIEW).setData(Uri.parse(webView?.url))
+                            val intent = Intent(Intent.ACTION_VIEW).setData(webView?.url?.toUri())
                             context.startActivity(intent)
                             showMenu = false
                         }
@@ -137,16 +138,16 @@ fun NovelDetailScreen(
                 }
             )
         }
-    ) { padding ->
+    ) { innerPadding ->
 
         Box(
-            modifier = Modifier.padding(padding)
+            modifier = Modifier.padding(innerPadding)
         ) {
             viewModel.uiState.value?.let { content ->
-                currentUrl = content.url
+                currentUrl = content.initialUrl
 
                 WebViewCompose(
-                    content.url,
+                    content.initialUrl,
                     content.cookies,
                     { webView = it },
                     { updateCurrentUrl(it) },

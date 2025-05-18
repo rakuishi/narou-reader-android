@@ -115,7 +115,7 @@ fun NovelListScreen(
     }
 
     LaunchedEffect(snackbarHostState) {
-        viewModel.snackbarMessageChannel.receiveAsFlow().collect {
+        viewModel.snackbarMessageChannel.receiveAsFlow().collect { it ->
             val message =
                 if (it.stringResId != null) context.getString(it.stringResId)
                 else it.string
@@ -130,17 +130,16 @@ fun NovelListScreen(
                     Text(text = stringResource(R.string.app_name))
                 },
                 subtitle = {
-                    viewModel.uiState.value.content?.fetchedAt?.let {
-                        Text(
-                            text = stringResource(
-                                R.string.updated_on,
-                                SimpleDateFormat(
-                                    if (LocaleUtil.isJa()) "M月d日 HH:mm" else "HH:mm, d LLLL",
-                                    if (LocaleUtil.isJa()) Locale.JAPAN else Locale.US
-                                ).format(it)
-                            ),
-                        )
-                    }
+                    val fetchedAt = viewModel.uiState.value.content?.fetchedAt ?: return@TopAppBar
+                    Text(
+                        text = stringResource(
+                            R.string.updated_on,
+                            SimpleDateFormat(
+                                if (LocaleUtil.isJa()) "M月d日 HH:mm" else "HH:mm, d LLLL",
+                                if (LocaleUtil.isJa()) Locale.JAPAN else Locale.US
+                            ).format(fetchedAt)
+                        ),
+                    )
                 },
                 actions = {
                     IconButton(onClick = {
@@ -161,14 +160,13 @@ fun NovelListScreen(
             onRefresh = ::refresh,
         ),
         snackbarHost = { SnackbarHost(snackbarHostState) },
-    ) { padding ->
-        if (viewModel.uiState.value.isEmpty) {
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
+    ) { innerPadding ->
+
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+        ) {
+            if (viewModel.uiState.value.isEmpty) {
                 Text(
                     modifier = Modifier
                         .align(alignment = Alignment.Center)
@@ -176,12 +174,7 @@ fun NovelListScreen(
                     text = stringResource(R.string.add_novel_from_fab),
                     style = MaterialTheme.typography.bodyLarge,
                 )
-            }
-        } else {
-            Box(
-                modifier = Modifier
-                    .padding(padding)
-            ) {
+            } else {
                 NovelList(
                     items = viewModel.uiState.value.content?.novelList ?: emptyList(),
                     { novel ->

@@ -1,5 +1,6 @@
 package com.rakuishi.nreader.ui.novel_detail
 
+import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -12,6 +13,7 @@ import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.repository.DataStoreRepository
 import com.rakuishi.nreader.repository.NovelRepository
 import com.rakuishi.nreader.ui.Destination
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -26,7 +28,7 @@ class NovelDetailViewModel(
 
     data class UiState(
         val novel: Novel,
-        val url: String,
+        val initialUrl: String,
         val cookies: Map<String, String>,
     )
 
@@ -53,7 +55,9 @@ class NovelDetailViewModel(
     }
 
     fun updateCurrentEpisodeNumberIfMatched(url: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
+            Log.e("NovelDetailViewModel", "updateCurrentEpisodeNumberIfMatched", throwable)
+        }) {
             val novel = novelRepository.updateCurrentEpisodeNumberIfMatched(url)
             if (novel != null) {
                 uiState.value = uiState.value?.copy(novel = novel)
