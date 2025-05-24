@@ -27,7 +27,13 @@ class GeminiViewModel(
 
         viewModelScope.launch {
             val prompt = """
-                以下の単語について、振り仮名付きで解説お願いします。
+                指定された単語の解説をお願いします。 
+
+                詳細：
+                - 振り仮名を付与
+                - 前後の挨拶は省略 
+                - プレーンテキスト形式 
+
                 単語: $inputText
             """.trimIndent()
             val result = model.generateContent(prompt).text ?: ""
