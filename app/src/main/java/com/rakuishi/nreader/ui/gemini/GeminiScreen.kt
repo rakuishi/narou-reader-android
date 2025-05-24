@@ -12,36 +12,19 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.LifecycleEventEffect
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun GeminiScreen(viewModel: GeminiViewModel) {
     val uiState by viewModel.uiState
-    val lifecycleOwner = LocalLifecycleOwner.current.lifecycle
 
-    DisposableEffect(lifecycleOwner) {
-        val lifecycleObserver = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> {
-                    viewModel.generateContext()
-                }
-
-                else -> {
-                    /* do nothing */
-                }
-            }
-        }
-        lifecycleOwner.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycleOwner.removeObserver(lifecycleObserver)
-        }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        viewModel.generateContext()
     }
 
     Box(

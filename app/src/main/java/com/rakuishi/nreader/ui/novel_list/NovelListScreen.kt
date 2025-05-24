@@ -30,7 +30,6 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.pullToRefresh
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.rakuishi.nreader.R
@@ -87,32 +86,18 @@ fun NovelListScreen(
 
     val pullToRefreshState = rememberPullToRefreshState()
 
-    DisposableEffect(lifecycleOwner) {
-        val lifecycleObserver = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        val permission = Manifest.permission.POST_NOTIFICATIONS
-                        val state = ContextCompat.checkSelfPermission(context, permission)
-                        if (state != PackageManager.PERMISSION_GRANTED) {
-                            permissionLauncher.launch(permission)
-                        }
-                    }
-                }
-
-                Lifecycle.Event.ON_RESUME -> {
-                    viewModel.fetchNovelList()
-                }
-
-                else -> {
-                    /* do nothing */
-                }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = Manifest.permission.POST_NOTIFICATIONS
+            val state = ContextCompat.checkSelfPermission(context, permission)
+            if (state != PackageManager.PERMISSION_GRANTED) {
+                permissionLauncher.launch(permission)
             }
         }
-        lifecycleOwner.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycleOwner.removeObserver(lifecycleObserver)
-        }
+    }
+
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        viewModel.fetchNovelList()
     }
 
     LaunchedEffect(snackbarHostState) {
