@@ -19,4 +19,5 @@
     <string name="add_novel_from_fab">Add a novel from plus button.</string>
     <string name="notification_channel_new_episode">New episode</string>
     <string name="notification_channel_new_episode_description">New episode: %s</string>
+    <string name="ask_gemini">Ask Gemini</string>
 </resources>

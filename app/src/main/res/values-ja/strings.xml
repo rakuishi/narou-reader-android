@@ -19,4 +19,5 @@
     <string name="add_novel_from_fab">小説をプラスボタンから追加できます。</string>
     <string name="notification_channel_new_episode">最新話</string>
     <string name="notification_channel_new_episode_description">最新話：%s</string>
+    <string name="ask_gemini">Ask Gemini</string>
 </resources>
