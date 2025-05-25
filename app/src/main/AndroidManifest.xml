@@ -32,6 +32,12 @@
             </intent-filter>
 
             <intent-filter>
+                <action android:name="android.intent.action.PROCESS_TEXT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+
+            <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -40,17 +46,6 @@
                 <data
                     android:host="novels"
                     android:scheme="narou" />
-            </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".ui.gemini.GeminiActivity"
-            android:exported="true"
-            android:label="@string/ask_gemini">
-            <intent-filter>
-                <action android:name="android.intent.action.PROCESS_TEXT" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
 

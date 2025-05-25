@@ -9,10 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.google.firebase.Firebase
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.rakuishi.nreader.model.Novel
 import com.rakuishi.nreader.repository.DataStoreRepository
 import com.rakuishi.nreader.repository.NovelRepository
 import com.rakuishi.nreader.ui.Destination
+import com.rakuishi.nreader.util.EventBus
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -30,6 +34,9 @@ class NovelDetailViewModel(
         val novel: Novel,
         val initialUrl: String,
         val cookies: Map<String, String>,
+        val showBottomSheet: Boolean = false,
+        val isGeneratingContent: Boolean = false,
+        val generateText: String = ""
     )
 
     val uiState: MutableState<UiState?> = mutableStateOf(null)
@@ -52,6 +59,10 @@ class NovelDetailViewModel(
                 cookies
             )
         }
+
+        EventBus.subscribe(viewModelScope) {
+            generateContext(it)
+        }
     }
 
     fun updateCurrentEpisodeNumberIfMatched(url: String) {
@@ -70,6 +81,41 @@ class NovelDetailViewModel(
         viewModelScope.launch {
             dataStoreRepository.saveCookies(url, cookiesString)
         }
+    }
+
+    fun generateContext(inputText: String) {
+        uiState.value = uiState.value?.copy(
+            showBottomSheet = true,
+            isGeneratingContent = true
+        )
+
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI())
+            .generativeModel("gemini-2.0-flash")
+
+        viewModelScope.launch {
+            val prompt = """
+                あなたは辞書です。
+                単語が与えられた場合、その振り仮名と最大 200 字程度の解説を提示してください。
+                出力は以下の形式に厳密に従ってください。
+                ---
+                [単語]（[振り仮名]）
+
+                [解説]
+                ---
+                $inputText
+            """.trimIndent()
+            val result = model.generateContent(prompt).text?.trimEnd() ?: ""
+            uiState.value = uiState.value?.copy(
+                isGeneratingContent = false,
+                generateText = result
+            )
+        }
+    }
+
+    fun hideBottomSheet() {
+        uiState.value = uiState.value?.copy(
+            showBottomSheet = false
+        )
     }
 
     companion object {

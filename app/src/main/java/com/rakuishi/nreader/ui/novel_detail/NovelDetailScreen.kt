@@ -2,7 +2,6 @@ package com.rakuishi.nreader.ui.novel_detail
 
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
 import android.net.http.SslError
 import android.webkit.CookieManager
 import android.webkit.SslErrorHandler
@@ -11,13 +10,17 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.CircularWavyProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -26,27 +29,32 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavController
 import com.rakuishi.nreader.BuildConfig
 import com.rakuishi.nreader.R
 import com.rakuishi.nreader.ui.component.IconDropdownMenuItem
-import androidx.core.net.toUri
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -56,10 +64,12 @@ fun NovelDetailScreen(
     viewModel: NovelDetailViewModel,
 ) {
     val context = LocalContext.current
+    val uiState by viewModel.uiState
     var currentUrl: String? = null
     var showMenu by remember { mutableStateOf(false) }
     var webView by remember { mutableStateOf<WebView?>(null) }
     var progress by remember { mutableFloatStateOf(0f) }
+    val sheetState = rememberModalBottomSheetState()
     val saveCookies = {
         currentUrl?.let {
             viewModel.saveCookies(it, CookieManager.getInstance().getCookie(it))
@@ -75,13 +85,13 @@ fun NovelDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = viewModel.uiState.value?.novel?.title ?: "",
+                        text = uiState?.novel?.title ?: "",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                 },
                 subtitle = {
-                    val novel = viewModel.uiState.value?.novel ?: return@TopAppBar
+                    val novel = uiState?.novel ?: return@TopAppBar
                     Text(
                         text = stringResource(
                             R.string.novel_episode,
@@ -111,9 +121,11 @@ fun NovelDetailScreen(
                         modifier =
                             Modifier
                                 .minimumInteractiveComponentSize()
-                                .size(IconButtonDefaults.smallContainerSize(
-                                    IconButtonDefaults.IconButtonWidthOption.Narrow
-                                )),
+                                .size(
+                                    IconButtonDefaults.smallContainerSize(
+                                        IconButtonDefaults.IconButtonWidthOption.Narrow
+                                    )
+                                ),
                         onClick = { showMenu = !showMenu }) {
                         Icon(Icons.Default.MoreVert, contentDescription = "")
                     }
@@ -133,7 +145,7 @@ fun NovelDetailScreen(
                             textResId = R.string.move_to_latest_episode,
                             iconResId = R.drawable.ic_new_episode_24
                         ) {
-                            viewModel.uiState.value?.novel?.latestEpisodeUrl?.let {
+                            uiState?.novel?.latestEpisodeUrl?.let {
                                 updateCurrentUrl(it)
                                 webView?.loadUrl(it)
                             }
@@ -156,7 +168,7 @@ fun NovelDetailScreen(
         Box(
             modifier = Modifier.padding(innerPadding)
         ) {
-            viewModel.uiState.value?.let { content ->
+            uiState?.let { content ->
                 currentUrl = content.initialUrl
 
                 WebViewCompose(
@@ -173,6 +185,35 @@ fun NovelDetailScreen(
                     progress = { progress },
                     modifier = Modifier.fillMaxWidth()
                 )
+            }
+        }
+
+        if (uiState?.showBottomSheet == true) {
+            // FIXME: https://issuetracker.google.com/issues/353304855
+            ModalBottomSheet(
+                onDismissRequest = { viewModel.hideBottomSheet() },
+                sheetState = sheetState,
+            ) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .padding(start = 32.dp, end = 32.dp, bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    AnimatedVisibility(visible = uiState?.isGeneratingContent == true) {
+                        CircularWavyProgressIndicator()
+                    }
+
+                    AnimatedVisibility(visible = uiState?.isGeneratingContent == false) {
+                        Text(
+                            text = uiState?.generateText ?: "",
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
+                }
             }
         }
     }
