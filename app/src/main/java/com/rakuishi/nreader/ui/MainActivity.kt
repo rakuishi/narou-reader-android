@@ -25,6 +25,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        // Prevent external access to PROCESS_TEXT
+        if (callingPackage != null && !callingPackage.equals(packageName)) {
+            finish()
+            return
+        }
+
         setContent {
             NReaderTheme {
                 // A surface container using the 'background' color from the theme
