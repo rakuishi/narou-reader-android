@@ -94,15 +94,13 @@ class NovelDetailViewModel(
 
         viewModelScope.launch {
             val prompt = """
-                あなたは辞書です。
-                単語が与えられた場合、その振り仮名と最大 200 字程度の解説を提示してください。
+                あなたは日本語の語彙に関する専門家であり、客観的かつ簡潔な辞書として機能します。
+                単語「$inputText」の振り仮名と 200 字程度の解説を提示してください。
                 出力は以下の形式に厳密に従ってください。
-                ---
+
                 [単語]（[振り仮名]）
 
                 [解説]
-                ---
-                $inputText
             """.trimIndent()
             val result = model.generateContent(prompt).text?.trimEnd() ?: ""
             uiState.value = uiState.value?.copy(
