@@ -48,6 +48,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent, caller: ComponentCaller) {
         super.onNewIntent(intent, caller)
         val text = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)?.toString() ?: ""
+        if (text.isEmpty()) return
+
         lifecycleScope.launch {
             EventBus.publish(text)
         }
