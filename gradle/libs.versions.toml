@@ -1,22 +1,22 @@
 [versions]
-androidGradlePlugin = "8.9.2"
+androidGradlePlugin = "8.11.0"
 androidxCore = "1.16.0"
-androidxCompose = "2025.05.00"
-androidxComposeMaterial3 = "1.4.0-alpha14"
+androidxCompose = "2025.06.01"
+androidxComposeMaterial3 = "1.4.0-alpha16"
 androidxComposeActivity = "1.10.1"
-androidxLifecycle = "2.9.0"
+androidxLifecycle = "2.9.1"
 androidxNavigation = "2.9.0"
 androidxTestExtJunit = "1.2.1"
-androidxWork = "2.10.1"
-datastore = "1.1.6"
-firebaseBom = "33.14.0"
-googleServices = "4.4.2"
+androidxWork = "2.10.2"
+datastore = "1.1.7"
+firebaseBom = "33.16.0"
+googleServices = "4.4.3"
 junit4 = "4.13.2"
-kotlin = "2.1.20"
-ktor = "2.3.13" # firebase-ai depending ktor 2 https://github.com/firebase/firebase-android-sdk/issues/6737
-ksp = "2.1.20-2.0.0"
-robolectric = "4.14.1"
-room = "2.7.1"
+kotlin = "2.2.0"
+ktor = "3.2.0" # firebase-ai depending ktor 2 https://github.com/firebase/firebase-android-sdk/issues/6737
+ksp = "2.2.0-2.0.2"
+robolectric = "4.15.1"
+room = "2.7.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
