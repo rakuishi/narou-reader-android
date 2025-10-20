@@ -50,13 +50,17 @@ class NovelDetailViewModel(
             } else {
                 episodeId
             }
+
+            // In Destination.createNovelDetailRoute, set the URL to open the latest novel.
+            // Save that value and display the TopBar subtitle appropriately.
             val url = novel.getEpisodeUrl(currentEpisodeId)
-            updateCurrentEpisodeNumberIfMatched(url)
+            val updatedNovel = novelRepository.updateCurrentEpisodeNumberIfMatched(url)
+
             delay(400L) // for smooth transition
             uiState.value = UiState(
-                novel,
-                url,
-                cookies
+                novel = updatedNovel ?: novel,
+                initialUrl = url,
+                cookies = cookies,
             )
         }
 
